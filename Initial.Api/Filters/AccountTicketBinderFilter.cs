@@ -1,12 +1,9 @@
 ﻿using Initial.Api.Controllers.Templates;
 using Initial.Api.Models;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using System;
 using System.Linq;
 using System.Security.Claims;
-using System.Threading.Tasks;
 
 namespace Initial.Api.Filters
 {

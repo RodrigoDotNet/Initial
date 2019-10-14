@@ -1,5 +1,5 @@
 ﻿using Initial.Api.Controllers.Templates;
-using Initial.Api.Models.Account;
+using Initial.Api.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using System;
@@ -14,7 +14,7 @@ namespace Initial.Api.Filters
 
         public AccessModeEnum? Mode { get; }
 
-        public AccessSpecialEnum? Special { get; }
+        public AccessPolicyEnum? Policy { get; }
 
         public AuthorizeFilter()
         {
@@ -26,26 +26,55 @@ namespace Initial.Api.Filters
             Mode = mode;
         }
 
-        public AuthorizeFilter(AccessSpecialEnum special)
+        public AuthorizeFilter(AccessPolicyEnum policy)
         {
-            Special = special;
+            Policy = policy;
         }
 
         public void OnActionExecuted(ActionExecutedContext context) { }
 
         public void OnActionExecuting(ActionExecutingContext context)
         {
-            var controller = context.Controller as ControllerDefaultBase;
+            var controller = context?.Controller as ControllerDefaultBase;
 
             if (controller != null
                 && controller.AccountTicket != null)
             {
-#warning Falta implementar verificações de acesso de Area, Mode, Special
+                if (Area == null && Mode == null && Policy == null)
+                    return;
 
-                return;
+                if (Area != null && Mode != null)
+                {
+                    var mode = controller.AccountService
+                        .GetAccessAreaMode(controller.AccountTicket, Area.Value)
+                        .Result;
+
+                    var all = Test(Mode.Value, mode);
+
+                    if (all) return;
+                }
+
+                if (Policy != null)
+                {
+                    var has = controller.AccountService
+                        .HasPolicyAccess(controller.AccountTicket, Policy.Value)
+                        .Result;
+
+                    if (has) return;
+                }
             }
 
+#warning Melhorar as mensagens de erro
             context.Result = new UnauthorizedResult();
+        }
+
+        public static bool Test(AccessModeEnum must, AccessModeEnum have)
+        {
+            foreach (Enum value in Enum.GetValues(typeof(AccessModeEnum)))
+                if (must.HasFlag(value) && !have.HasFlag(value))
+                    return false;
+
+            return true;
         }
     }
 }

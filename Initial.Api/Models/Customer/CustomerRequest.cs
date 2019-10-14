@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Initial.Api.Models
 {
-    public class EnterpriseRequest : EntityRequest
+    public class CustomerRequest : EntityRequest
     {
         [Required]
         [StringLength(250, MinimumLength = 2)]

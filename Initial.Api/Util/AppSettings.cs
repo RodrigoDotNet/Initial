@@ -2,11 +2,10 @@
 {
     public class AppSettings
     {
-        public string JWT_Secret { get; set; }
-            = "If you want to keep a secret, you must also hide it from yourself.";
-
         public CacheSettings Cache { get; set; }
             = CacheSettings.Default;
+        public SecuritySettings Security { get; set; }
+            = SecuritySettings.Default;
 
         public static AppSettings Default
             => new AppSettings { };
@@ -17,6 +16,17 @@
 
             public static CacheSettings Default
                 => new CacheSettings { };
+        }
+
+        public class SecuritySettings
+        {
+            public string Secret { get; set; }
+                = "If you want to keep a secret, you must also hide it from yourself.";
+
+            public int Expires { get; set; } = 7;
+
+            public static SecuritySettings Default
+                => new SecuritySettings { };
         }
     }
 }

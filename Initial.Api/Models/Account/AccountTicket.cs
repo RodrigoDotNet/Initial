@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Initial.Api.Models
 {
@@ -16,5 +13,7 @@ namespace Initial.Api.Models
         public Guid PublicId { get; set; }
 
         public Guid PrivateId { get; set; }
+
+        public int EnterpriseId { get; set; }
     }
 }

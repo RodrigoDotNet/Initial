@@ -9,5 +9,9 @@ namespace Initial.Api.Models
         Task<IActionResult> Login(AccountLoginRequest request);
 
         bool IsValid(Guid publicId, out AccountTicket ticket);
+
+        Task<AccessModeEnum> GetAccessAreaMode(AccountTicket ticket, AccessAreaEnum area);
+
+        Task<bool> HasPolicyAccess(AccountTicket ticket, AccessPolicyEnum policy);
     }
 }

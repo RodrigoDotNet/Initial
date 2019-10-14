@@ -1,15 +1,11 @@
-﻿using Initial.Api.Models.Database.Tables;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace Initial.Api.Models.Database
 {
-    public class Enterprise : Audit
+    public class Enterprise : Templates.Audit
     {
-        [Key]
-        public int Id { get; set; }
-
         [Required]
         [MaxLength(250)]
         public string Name { get; set; }

@@ -61,6 +61,24 @@ namespace Initial.Api.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Invalid record..
+        /// </summary>
+        public static string EnterpriseId_Invalid {
+            get {
+                return ResourceManager.GetString("EnterpriseId_Invalid", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Optimistic concurrency conflit. The record you attempted to edit was modified by another user after you got the original value..
+        /// </summary>
+        public static string EntityVersion_Conflict {
+            get {
+                return ResourceManager.GetString("EntityVersion_Conflict", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to An error occurred..
         /// </summary>
         public static string Error_Error {

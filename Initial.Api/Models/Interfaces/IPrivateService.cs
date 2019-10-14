@@ -3,13 +3,13 @@ using System.Threading.Tasks;
 
 namespace Initial.Api.Models.Interfaces
 {
-    public interface IService<RQ, RS>
+    public interface IPrivateService<RQ, RS>
     {
-        Task<IActionResult> GetAllAsync();
+        Task<IActionResult> GetAllAsync(AccountTicket user);
 
-        Task<IActionResult> GetAsync(int id);
+        Task<IActionResult> GetAsync(AccountTicket user, int id);
 
-        Task<IActionResult> RemoveAsync(int id);
+        Task<IActionResult> RemoveAsync(AccountTicket user, int id);
 
         Task<IActionResult> DeleteAsync(AccountTicket user, int id);
 

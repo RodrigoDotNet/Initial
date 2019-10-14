@@ -2,19 +2,21 @@
 using Initial.Api.Models.Templates;
 using Microsoft.EntityFrameworkCore;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Initial.Api.Models
 {
     public partial class AccountRepository
-        : Repository<User>, IAccountRepository
+        : PrivateRepository<User>, IAccountRepository
     {
         public AccountRepository(InitialDatabase database)
             : base(database)
         {
         }
 
-        public override async Task<User> GetAsync(int id)
+        public async Task<User> GetAsync(int id)
         {
             return await _database.Users
                 .FindAsync(id);
@@ -31,7 +33,8 @@ namespace Initial.Api.Models
                 );
         }
 
-        public async Task<User> GetByPublicIdAsync(Guid publicId)
+        public async Task<User> GetByPublicIdAsync
+            (Guid publicId)
         {
             return await _database.Users
                 .FirstOrDefaultAsync(e =>
@@ -39,20 +42,34 @@ namespace Initial.Api.Models
                 );
         }
 
-        public override async Task SaveAsync(User model)
+        public async Task<IEnumerable<AreaAccess>> GetAreaAccess
+            (AccountTicket user, int areaId)
         {
-            if (model.Id > 0)
-            {
-                _database.Entry(model).State = EntityState.Modified;
-            }
-            else
-            {
-                await _database.Users.AddAsync(model);
-            }
+            return await _database.AreaAccess
+                .AsNoTracking()
+                .Include(e => e.Group.UserGroups)
 
-            await _database.SaveChangesAsync();
+                .Where(e => e.Group.UserGroups
+                    .Any(ug => ug.UserId == user.Id)
+                )
+                .Where(e => e.AreaId == areaId)
 
-            return;
+                .ToListAsync();
+        }
+
+        public async Task<bool> HasPolicyAccess
+            (AccountTicket user, int policyId)
+        {
+            return await _database.PolicyAccess
+                .AsNoTracking()
+                .Include(e => e.Group.UserGroups)
+
+                .Where(e => e.Group.UserGroups
+                    .Any(ug => ug.UserId == user.Id)
+                )
+                .Where(e => e.PolicyId == policyId)
+
+                .AnyAsync();
         }
     }
 }

@@ -1,8 +1,9 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Initial.Api.Models.Templates;
+using System.ComponentModel.DataAnnotations;
 
 namespace Initial.Api.Models
 {
-    public class EnterpriseResponse
+    public class EnterpriseResponse : EntityResponse
     {
         public int Id { get; set; }
 

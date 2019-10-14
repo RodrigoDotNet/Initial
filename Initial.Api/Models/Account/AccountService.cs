@@ -1,4 +1,5 @@
-﻿using Initial.Api.Util;
+﻿using Initial.Api.Models.Templates;
+using Initial.Api.Util;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using System;
@@ -9,59 +10,61 @@ using System.Threading.Tasks;
 
 namespace Initial.Api.Models
 {
-    public class AccountService : IAccountService
+    public class AccountService : Service<IAccountRepository>, IAccountService
     {
-        protected readonly IAccountRepository _repository;
-
-        protected readonly AppSettings _appSettings;
-
         public AccountService(IAccountRepository repository, AppSettings appSettings)
-        {
-            _repository = repository;
-            _appSettings = appSettings;
-        }
+            : base(repository, appSettings) { }
 
         public async Task<IActionResult> Login(AccountLoginRequest request)
         {
-            var passwordHash = CryptoHelper.Guid(request.Password);
+            if (request == null)
+                return new BadRequestResult();
 
-            var model = await _repository
-                .GetByEmailPasswordAsync(request.Email, passwordHash);
-
-            if (model == null) return new NotFoundResult();
-
-            var tokenHandler = new JwtSecurityTokenHandler();
-
-            var key = Encoding.ASCII.GetBytes(_appSettings.JWT_Secret);
-
-            var tokenDescriptor = new SecurityTokenDescriptor
+            try
             {
-                Subject = new ClaimsIdentity(new Claim[]
+                var passwordHash = CryptoHelper.Guid(request.Password);
+
+                var model = await _repository
+                    .GetByEmailPasswordAsync(request.Email, passwordHash);
+
+                if (model == null) return new NotFoundResult();
+
+                var tokenHandler = new JwtSecurityTokenHandler();
+
+                var key = Encoding.ASCII.GetBytes(_appSettings.Security.Secret);
+
+                var tokenDescriptor = new SecurityTokenDescriptor
                 {
+                    Subject = new ClaimsIdentity(new Claim[]
+                    {
                     new Claim(ClaimTypes.Name, model.Name.ToString()),
                     new Claim(ClaimTypes.Email, model.Email.ToString()),
                     new Claim(ClaimTypes.Sid, model.PublicId.ToString())
-                }),
+                    }),
 
-#warning Definir quantidade de dias via AppSettings.
-                Expires = DateTime.UtcNow.AddDays(7),
+                    Expires = DateTime.UtcNow.AddDays(_appSettings.Security.Expires),
 
-                SigningCredentials = new SigningCredentials
-                    (new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
-            };
+                    SigningCredentials = new SigningCredentials
+                        (new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+                };
 
-            var token = tokenHandler.CreateToken(tokenDescriptor);
+                var token = tokenHandler.CreateToken(tokenDescriptor);
 
-            var response = new AccountLoginResponse
+                var response = new AccountLoginResponse
+                {
+                    Email = model.Email,
+                    Id = model.Id,
+                    Name = model.Name,
+                    PublicId = model.PublicId,
+                    Token = tokenHandler.WriteToken(token)
+                };
+
+                return new OkObjectResult(response);
+            }
+            catch
             {
-                Email = model.Email,
-                Id = model.Id,
-                Name = model.Name,
-                PublicId = model.PublicId,
-                Token = tokenHandler.WriteToken(token)
-            };
-
-            return new OkObjectResult(response);
+                return new ConflictObjectResult(State);
+            }
         }
 
         public bool IsValid(Guid publicId, out AccountTicket ticket)
@@ -84,9 +87,35 @@ namespace Initial.Api.Models
                 Name = model.Name,
                 PrivateId = model.PrivateId,
                 PublicId = model.PublicId,
+                EnterpriseId = model.EnterpriseId
             };
 
             return true;
+        }
+
+        public async Task<AccessModeEnum> GetAccessAreaMode(AccountTicket ticket, AccessAreaEnum area)
+        {
+            var response = new AccessModeEnum();
+
+            var lst = await _repository.GetAreaAccess(ticket, (int)area);
+
+            foreach (var item in lst)
+            {
+                if (item.CanCreate) response |= AccessModeEnum.Create;
+
+                if (item.CanDelete) response |= AccessModeEnum.Delete;
+
+                if (item.CanModify) response |= AccessModeEnum.Modify;
+
+                if (item.CanRead) response |= AccessModeEnum.Read;
+            }
+
+            return response;
+        }
+
+        public async Task<bool> HasPolicyAccess(AccountTicket ticket, AccessPolicyEnum policy)
+        {
+            return await _repository.HasPolicyAccess(ticket, (int)policy);
         }
     }
 }

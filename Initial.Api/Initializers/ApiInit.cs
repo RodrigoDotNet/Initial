@@ -78,7 +78,7 @@ namespace Initial.Api.Initializers
         {
             // Ref.: @JwtCustom
 
-            var key = Encoding.ASCII.GetBytes(appSettings.JWT_Secret);
+            var key = Encoding.ASCII.GetBytes(appSettings.Security.Secret);
 
             services
                 .AddAuthentication(x =>

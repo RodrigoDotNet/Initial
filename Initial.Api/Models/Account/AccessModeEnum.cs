@@ -1,16 +1,20 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
-namespace Initial.Api.Models.Account
+namespace Initial.Api.Models
 {
     [Flags]
     public enum AccessModeEnum
     {
+        None = 0,
+
         Read = 1,
+
         Create = 2,
+
         Modify = 4,
-        Delete = 8
+
+        Delete = 8,
+
+        All = 1 + 2 + 4 + 8
     }
 }
