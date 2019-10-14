@@ -1,0 +1,43 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29306.81
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Initial.Api", "Initial.Api\Initial.Api.csproj", "{F899CBAC-FD62-4BC0-885A-5D600E6CD7A1}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Initial.Api.Tests", "Initial.Api.Tests\Initial.Api.Tests.csproj", "{84B9075F-D9E2-43AF-AA0E-0C0E8CB8CA39}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F899CBAC-FD62-4BC0-885A-5D600E6CD7A1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F899CBAC-FD62-4BC0-885A-5D600E6CD7A1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F899CBAC-FD62-4BC0-885A-5D600E6CD7A1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F899CBAC-FD62-4BC0-885A-5D600E6CD7A1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{84B9075F-D9E2-43AF-AA0E-0C0E8CB8CA39}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{84B9075F-D9E2-43AF-AA0E-0C0E8CB8CA39}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{84B9075F-D9E2-43AF-AA0E-0C0E8CB8CA39}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{84B9075F-D9E2-43AF-AA0E-0C0E8CB8CA39}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {A4D4526A-4BBA-45C5-8004-AFE742AB5E95}
+	EndGlobalSection
+	GlobalSection(TeamFoundationVersionControl) = preSolution
+		SccNumberOfProjects = 3
+		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
+		SccTeamFoundationServer = https://dev.azure.com/bpmobi
+		SccLocalPath0 = .
+		SccProjectUniqueName1 = Initial.Api\\Initial.Api.csproj
+		SccProjectName1 = Initial.Api
+		SccLocalPath1 = Initial.Api
+		SccProjectUniqueName2 = Initial.Api.Tests\\Initial.Api.Tests.csproj
+		SccProjectName2 = Initial.Api.Tests
+		SccLocalPath2 = Initial.Api.Tests
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,137 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Initial.Api</name>
+    </assembly>
+    <members>
+        <member name="T:Initial.Api.Controllers.AccountController">
+            <summary>
+            Serviço de autenticação
+            </summary>
+        </member>
+        <member name="M:Initial.Api.Controllers.AccountController.Login(Initial.Api.Models.AccountLoginRequest)">
+            <summary>
+            Método de login
+            </summary>
+            <param name="request">Requisição de login</param>
+            <returns>Informações do usuário e token (JWT)</returns>
+        </member>
+        <member name="T:Initial.Api.Controllers.ErrorController">
+            <summary>
+            Tratamento de erro
+            </summary>
+        </member>
+        <member name="P:Initial.Api.Models.AccountLoginRequest.Email">
+            <summary>
+            Email
+            </summary>
+        </member>
+        <member name="P:Initial.Api.Models.AccountLoginRequest.Password">
+            <summary>
+            Senha
+            </summary>
+        </member>
+        <member name="P:Initial.Api.Models.AccountLoginResponse.Id">
+            <summary>
+            Código
+            </summary>
+        </member>
+        <member name="P:Initial.Api.Models.AccountLoginResponse.Name">
+            <summary>
+            Nome
+            </summary>
+        </member>
+        <member name="P:Initial.Api.Models.AccountLoginResponse.PublicId">
+            <summary>
+            Chave pública
+            </summary>
+        </member>
+        <member name="P:Initial.Api.Models.AccountLoginResponse.Email">
+            <summary>
+            Email
+            </summary>
+        </member>
+        <member name="P:Initial.Api.Models.AccountLoginResponse.Token">
+            <summary>
+            Token (JWT)
+            </summary>
+        </member>
+        <member name="T:Initial.Api.Resources.Examples">
+            <summary>
+              A strongly-typed resource class, for looking up localized strings, etc.
+            </summary>
+        </member>
+        <member name="P:Initial.Api.Resources.Examples.ResourceManager">
+            <summary>
+              Returns the cached ResourceManager instance used by this class.
+            </summary>
+        </member>
+        <member name="P:Initial.Api.Resources.Examples.Culture">
+            <summary>
+              Overrides the current thread's CurrentUICulture property for all
+              resource lookups using this strongly typed resource class.
+            </summary>
+        </member>
+        <member name="P:Initial.Api.Resources.Examples.Email">
+            <summary>
+              Looks up a localized string similar to email@email.com.
+            </summary>
+        </member>
+        <member name="P:Initial.Api.Resources.Examples.Name">
+            <summary>
+              Looks up a localized string similar to José da Silva.
+            </summary>
+        </member>
+        <member name="P:Initial.Api.Resources.Examples.Password">
+            <summary>
+              Looks up a localized string similar to abcd1234@$_-.
+            </summary>
+        </member>
+        <member name="P:Initial.Api.Resources.Examples.Token">
+            <summary>
+              Looks up a localized string similar to eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c.
+            </summary>
+        </member>
+        <member name="T:Initial.Api.Resources.Messages">
+            <summary>
+              A strongly-typed resource class, for looking up localized strings, etc.
+            </summary>
+        </member>
+        <member name="P:Initial.Api.Resources.Messages.ResourceManager">
+            <summary>
+              Returns the cached ResourceManager instance used by this class.
+            </summary>
+        </member>
+        <member name="P:Initial.Api.Resources.Messages.Culture">
+            <summary>
+              Overrides the current thread's CurrentUICulture property for all
+              resource lookups using this strongly typed resource class.
+            </summary>
+        </member>
+        <member name="P:Initial.Api.Resources.Messages.Error_Error">
+            <summary>
+              Looks up a localized string similar to An error occurred..
+            </summary>
+        </member>
+        <member name="P:Initial.Api.Resources.Messages.Error_ErrorLocalDevelopment">
+            <summary>
+              Looks up a localized string similar to This shouldn&apos;t be invoked in non-development environments..
+            </summary>
+        </member>
+        <member name="P:Initial.Api.Resources.Messages.Required">
+            <summary>
+              Looks up a localized string similar to The field is required..
+            </summary>
+        </member>
+        <member name="P:Initial.Api.Resources.Messages.StringLength">
+            <summary>
+              Looks up a localized string similar to {0} length can&apos;t be more than {1}..
+            </summary>
+        </member>
+        <member name="P:Initial.Api.Resources.Messages.StringLengthBetween">
+            <summary>
+              Looks up a localized string similar to {0} length must be between {2} and {1}..
+            </summary>
+        </member>
+    </members>
+</doc>

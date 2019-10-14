@@ -1,0 +1,14 @@
+{
+  "ErrorHandler": {
+    "link": "https://docs.microsoft.com/en-us/aspnet/core/web-api/handle-errors?view=aspnetcore-2.2"
+  },
+  "ValidateModel": {
+    "link": "https://github.com/aspnet/AspNetCore.Docs"
+  },
+  "ResponseCompression": {
+    "link": "https://docs.microsoft.com/en-us/aspnet/core/performance/response-compression?view=aspnetcore-2.2"
+  },
+  "JwtCustom": {
+    "link": "https://jasonwatmore.com/post/2018/08/14/aspnet-core-21-jwt-authentication-tutorial-with-example-api#app-settings-cs"
+  }
+}
