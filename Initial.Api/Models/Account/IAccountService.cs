@@ -10,8 +10,8 @@ namespace Initial.Api.Models
 
         bool IsValid(Guid publicId, out AccountTicket ticket);
 
-        Task<AccessModeEnum> GetAccessAreaMode(AccountTicket ticket, AccessAreaEnum area);
+        Task<ModeEnum> GetAccessAreaMode(AccountTicket ticket, AreaEnum area);
 
-        Task<bool> HasPolicyAccess(AccountTicket ticket, AccessPolicyEnum policy);
+        Task<bool> HasPolicyAccess(AccountTicket ticket, PolicyEnum policy);
     }
 }

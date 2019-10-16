@@ -15,5 +15,7 @@ namespace Initial.Api.Models.Database
         public Guid PublicId { get; set; }
 
         public virtual ICollection<User> Users { get; set; }
+
+        public virtual ICollection<Group> Groups { get; set; }
     }
 }

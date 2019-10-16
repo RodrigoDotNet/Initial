@@ -10,5 +10,7 @@ namespace Initial.Api.Models.Database
         public string Name { get; set; }
 
         public virtual ICollection<AreaAccess> AreaAccess { get; set; }
+
+        public virtual ICollection<Policy> Policies { get; set; }
     }
 }

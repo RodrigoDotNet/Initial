@@ -1,5 +1,6 @@
 ﻿using Initial.Api.Resources;
 using Initial.Api.Util;
+using System;
 using System.Linq;
 
 namespace Initial.Api.Models.Database
@@ -18,19 +19,19 @@ namespace Initial.Api.Models.Database
                 {
                     var enterprise = new Enterprise
                     {
-                        Name = $"LM",
-                        PrivateId = CryptoHelper.Guid($"LM#"),
-                        PublicId = CryptoHelper.Guid($"LM$")
+                        Name = $"Enterprise A",
+                        PrivateId = CryptoHelper.Guid($"EA#"),
+                        PublicId = CryptoHelper.Guid($"EA$")
                     };
 
                     context.Enterprises.Add(enterprise);
                 }
 
-                for (int i = 0; i < 5; i++)
+                for (var i = 1; i <= 5; i++)
                 {
                     var enterprise = new Enterprise
                     {
-                        Name = $"Ent {i}",
+                        Name = $"Enterprise B{i}",
                         PrivateId = CryptoHelper.Guid($"E#{i}"),
                         PublicId = CryptoHelper.Guid($"E${i}")
                     };
@@ -48,14 +49,34 @@ namespace Initial.Api.Models.Database
                 var groups = new Group[]
                 {
                     new Group{
-                        Name ="Configuração"
+                        Name ="Security"
                     },
                     new Group{
-                        Name ="Operação"
+                        Name ="Management"
+                    },
+                    new Group{
+                        Name ="Configuration"
+                    },
+                    new Group{
+                        Name ="Sales"
+                    },
+                    new Group{
+                        Name ="Operation"
                     }
                 };
 
                 context.Groups.AddRange(groups);
+
+                foreach (var enterprise in context.Enterprises)
+                {
+                    var user = new Group
+                    {
+                        Name = $"{enterprise.Name}'s User",
+                        Enterprise = enterprise
+                    };
+
+                    context.Groups.Add(user);
+                }
 
                 context.SaveChanges();
             }
@@ -65,26 +86,35 @@ namespace Initial.Api.Models.Database
                 var users = new User[]
                 {
                     new User{
-                        Name ="LM",
+                        Name ="User",
                         PrivateId = CryptoHelper.Guid("U$1"),
                         PublicId = CryptoHelper.Guid("UP1"),
-                        Email = "lm@lm.com.br",
-                        Password = CryptoHelper.Guid("lm2019"),
-                        Enterprise = context.Enterprises.First(e => e.Name == "LM")
+                        Email = "user@enterprisea.com",
+                        Password = CryptoHelper.Guid("user2019"),
+                        Enterprise = context.Enterprises
+                            .First(e => e.Name == "Enterprise A")
                     }
                 };
 
                 context.Users.AddRange(users);
 
-                context.SaveChanges();
-            }
-
-            if (!context.UserGroups.Any())
-            {
-                foreach (var user in context.Users)
+                foreach (var group in context.Groups
+                    .Where(e => e.EnterpriseId == null))
                 {
-                    foreach (var group in context.Groups)
+                    foreach (var enterprise in context.Enterprises)
                     {
+                        var user = new User
+                        {
+                            Name = group.Name,
+                            PrivateId = CryptoHelper.Guid(group.Name + "$" + enterprise.Name),
+                            PublicId = CryptoHelper.Guid(group.Name + "P" + enterprise.Name),
+                            Email = $"{group.Name}@{enterprise.Name}.com".Replace(" ", "").ToLower(),
+                            Password = CryptoHelper.Guid(group.Name.ToLower()),
+                            Enterprise = enterprise
+                        };
+
+                        context.Users.Add(user);
+
                         var userGroup = new UserGroup
                         {
                             User = user,
@@ -103,10 +133,16 @@ namespace Initial.Api.Models.Database
                 var areas = new Area[]
                 {
                     new Area{
-                        Name ="Enterprise"
+                        Id = (int)AreaEnum.User,
+                        Name = "User"
                     },
                     new Area{
-                        Name ="Customer"
+                        Id = (int)AreaEnum.Group,
+                        Name = "Group"
+                    },
+                    new Area{
+                        Id = (int)AreaEnum.Customer,
+                        Name = "Customer"
                     }
                 };
 
@@ -117,22 +153,151 @@ namespace Initial.Api.Models.Database
 
             if (!context.AreaAccess.Any())
             {
-                foreach (var area in context.Areas)
                 {
-                    foreach (var group in context.Groups)
-                    {
-                        var areaAccess = new AreaAccess
-                        {
-                            Area = area,
-                            Group = group,
-                            CanCreate = true,
-                            CanDelete = true,
-                            CanModify = true,
-                            CanRead = true
-                        };
+                    var area = context.Areas
+                      .Find((int)AreaEnum.Customer);
 
-                        context.AreaAccess.AddRange(areaAccess);
+                    var group = context.Groups
+                        .First(e => e.Name == "Sales");
+
+                    var areaAccess = new AreaAccess
+                    {
+                        Area = area,
+                        Group = group,
+                        CanCreate = true,
+                        CanDelete = false,
+                        CanModify = true,
+                        CanRead = true
+                    };
+
+                    context.AreaAccess.Add(areaAccess);
+                }
+
+                {
+                    var area = context.Areas
+                      .Find((int)AreaEnum.Customer);
+
+                    var group = context.Groups
+                        .First(e => e.Name == "Management");
+
+                    var areaAccess = new AreaAccess
+                    {
+                        Area = area,
+                        Group = group,
+                        CanCreate = true,
+                        CanDelete = true,
+                        CanModify = true,
+                        CanRead = true
+                    };
+
+                    context.AreaAccess.Add(areaAccess);
+                }
+
+                {
+                    var area = context.Areas
+                      .Find((int)AreaEnum.Customer);
+
+                    var group = context.Groups
+                        .First(e => e.Name == "Operation");
+
+                    var areaAccess = new AreaAccess
+                    {
+                        Area = area,
+                        Group = group,
+                        CanCreate = false,
+                        CanDelete = false,
+                        CanModify = false,
+                        CanRead = true
+                    };
+
+                    context.AreaAccess.Add(areaAccess);
+                }
+
+                {
+                    var area = context.Areas
+                      .Find((int)AreaEnum.Group);
+
+                    var group = context.Groups
+                        .First(e => e.Name == "Security");
+
+                    var areaAccess = new AreaAccess
+                    {
+                        Area = area,
+                        Group = group,
+                        CanCreate = true,
+                        CanDelete = true,
+                        CanModify = true,
+                        CanRead = true
+                    };
+
+                    context.AreaAccess.Add(areaAccess);
+                }
+
+                {
+                    var area = context.Areas
+                      .Find((int)AreaEnum.User);
+
+                    var group = context.Groups
+                        .First(e => e.Name == "Security");
+
+                    var areaAccess = new AreaAccess
+                    {
+                        Area = area,
+                        Group = group,
+                        CanCreate = true,
+                        CanDelete = true,
+                        CanModify = true,
+                        CanRead = true
+                    };
+
+                    context.AreaAccess.Add(areaAccess);
+                }
+
+                context.SaveChanges();
+            }
+
+            if (!context.Policies.Any())
+            {
+                var area = context.Areas
+                    .Find((int)AreaEnum.User);
+
+                var policies = new Policy[]
+                {
+                    new Policy{
+                        Id = (int)PolicyEnum.User_ChangePassword,
+                        Area = area,
+                        Name = "Change Password"
+                    },
+                    new Policy{
+                        Id = (int)PolicyEnum.User_ChangeEmail,
+                        Area = area,
+                        Name = "Change Email"
                     }
+                };
+
+                context.Policies.AddRange(policies);
+
+                context.SaveChanges();
+            }
+
+            if (!context.PolicyAccess.Any())
+            {
+                var area = context.Areas
+                    .Find((int)AreaEnum.User);
+
+                var group = context.Groups
+                    .First(e => e.Name == "Security");
+
+                foreach (var policy in context.Policies
+                    .Where(e => e.AreaId == area.Id))
+                {
+                    var policyAccess = new PolicyAccess
+                    {
+                        Group = group,
+                        Policy = policy
+                    };
+
+                    context.PolicyAccess.AddRange(policyAccess);
                 }
 
                 context.SaveChanges();
@@ -148,11 +313,13 @@ namespace Initial.Api.Models.Database
                 {
                     for (int i = 0; i < 5; i++)
                     {
+                        var guid = Guid.NewGuid().ToString().Substring(0, 4);
+
                         var customer = new Customer
                         {
                             Enterprise = enterprise,
                             Email = Examples.Email,
-                            Name = $"{enterprise.Name} - Cus {i}"
+                            Name = $"Customers {guid}"
                         };
 
                         context.Customers.Add(customer);

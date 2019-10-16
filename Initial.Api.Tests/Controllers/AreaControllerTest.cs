@@ -3,30 +3,24 @@ using Initial.Api.Models;
 using Microsoft.AspNetCore.Mvc;
 using NUnit.Framework;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace Initial.Api.Tests.Controllers
 {
     [TestFixture]
-    public class EnterpriseControllerTest : ControllerServiceBaseTest
-        <EnterpriseRepository, EnterpriseService, EnterpriseController>
+    public class AreaControllerTest : ControllerServiceBaseTest
+        <AreaRepository, AreaService, AreaController>
     {
         [SetUp]
         public override void Setup()
         {
             base.Setup();
 
-            Repository = new EnterpriseRepository(DbContext);
+            Repository = new AreaRepository(DbContext);
 
-            Service = new EnterpriseService(Repository, AppSettings);
+            Service = new AreaService(Repository, AppSettings);
 
-            Controller = new EnterpriseController(Service)
-            {
-                AccountService = AccountService,
-
-                AccountTicket = AccountTicket
-            };
+            Controller = new AreaController(Service);
         }
 
         [Test]
@@ -46,9 +40,9 @@ namespace Initial.Api.Tests.Controllers
 
             var value = okObjectResult.Value;
 
-            Assert.IsInstanceOf<IEnumerable<EnterpriseResponse>>(value);
+            Assert.IsInstanceOf<IEnumerable<AreaResponse>>(value);
 
-            var response = (IEnumerable<EnterpriseResponse>)value;
+            var response = (IEnumerable<AreaResponse>)value;
 
             Assert.IsNotEmpty(response);
         }
@@ -58,7 +52,7 @@ namespace Initial.Api.Tests.Controllers
         {
             // Arrange
 
-            var id = AccountTicket.EnterpriseId;
+            var id = 1;
 
             // Act
 
@@ -72,9 +66,9 @@ namespace Initial.Api.Tests.Controllers
 
             var value = okObjectResult.Value;
 
-            Assert.IsInstanceOf<EnterpriseResponse>(value);
+            Assert.IsInstanceOf<AreaResponse>(value);
 
-            var response = (EnterpriseResponse)value;
+            var response = (AreaResponse)value;
 
             Assert.AreEqual(id, response.Id);
         }

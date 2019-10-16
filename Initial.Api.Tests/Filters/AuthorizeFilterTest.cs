@@ -1,9 +1,12 @@
 ﻿using Initial.Api.Controllers;
 using Initial.Api.Filters;
 using Initial.Api.Models;
+using Initial.Api.Models.Database;
 using Initial.Api.Tests.Controllers;
 using Initial.Api.Tests.Util;
+using Initial.Api.Util;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
 using System.Linq;
 
@@ -11,12 +14,44 @@ namespace Initial.Api.Tests.Filters
 {
     [TestFixture]
     public class AuthorizeFilterTest 
-        : ControllerDefaultBaseTest<CustomerController>
     {
+        protected InitialDatabase DbContext { get; private set; }
+
+        public AppSettings AppSettings { get; private set; }
+
+        public AccountService AccountService { get; private set; }
+
+        protected CustomerController Controller { get; set; }
+
+        protected AccountTicket AccountTicket { get; set; }
+
         [SetUp]
-        public override void Setup()
+        public virtual void Setup()
         {
-            base.Setup();
+            var options = new DbContextOptionsBuilder<InitialDatabase>()
+                .UseInMemoryDatabase(databaseName: "Initial_Api")
+                .Options;
+
+            DbContext = new InitialDatabase(options);
+
+            InitialDatabaseInit.EnsureCreated = false;
+
+            InitialDatabaseInit.Initialize(DbContext);
+
+            AppSettings = AppSettings.Default;
+
+            AccountService = new AccountService(new AccountRepository(DbContext), AppSettings);
+
+            AccountService.IsValid(CryptoHelper.Guid("UP1"), out AccountTicket accountTicket);
+
+            AccountTicket = accountTicket;
+        }
+
+        [TearDown]
+        public virtual void Down()
+        {
+            DbContext.Database
+                .EnsureDeleted();
         }
 
         [Test]
@@ -74,28 +109,41 @@ namespace Initial.Api.Tests.Filters
                 (actionExecutingContext.Result);
         }
 
-        [Test]
-        public void OnActionExecuting_Area()
+        [TestCase(ModeEnum.All)]
+        [TestCase(ModeEnum.Read)]
+        [TestCase(ModeEnum.Create)]
+        [TestCase(ModeEnum.Delete)]
+        [TestCase(ModeEnum.Modify)]
+        public void OnActionExecuting_Area(ModeEnum mode)
         {
             // Arrange
 
             var filter = new AuthorizeFilter
-                (AccessAreaEnum.Customer, AccessModeEnum.Read);
+                (AreaEnum.Customer, mode);
 
             var access = new Models.Database.AreaAccess
             {
-                AreaId = (int)AccessAreaEnum.Customer,
-                CanRead = true
+                AreaId = (int)AreaEnum.Customer,
+                Group = new Models.Database.Group
+                {
+                    Name = "Test",
+                    UserGroups = new[]
+                    {
+                        new Models.Database.UserGroup
+                        {
+                            UserId = AccountTicket.Id
+                        }
+                    }
+                },
+                CanRead = mode.HasFlag(ModeEnum.Read),
+                CanCreate = mode.HasFlag(ModeEnum.Create),
+                CanModify = mode.HasFlag(ModeEnum.Modify),
+                CanDelete = mode.HasFlag(ModeEnum.Delete)
             };
 
-            access.GroupId = Database.UserGroups
-                .Where(e => e.UserId == AccountTicket.Id)
-                .Select(e => e.GroupId)
-                .First();
+            DbContext.AreaAccess.Add(access);
 
-            Database.AreaAccess.Add(access);
-
-            Database.SaveChanges();
+            DbContext.SaveChanges();
 
             Controller = new CustomerController(null)
             {
@@ -116,28 +164,38 @@ namespace Initial.Api.Tests.Filters
             Assert.IsNull(actionExecutingContext.Result);
         }
 
-        [Test]
-        public void OnActionExecuting_Area_UnauthorizedResult()
+        [TestCase(ModeEnum.All)]
+        [TestCase(ModeEnum.Create)]
+        [TestCase(ModeEnum.Delete)]
+        [TestCase(ModeEnum.Modify)]
+        public void OnActionExecuting_Area_UnauthorizedResult
+            (ModeEnum mode)
         {
             // Arrange
 
             var filter = new AuthorizeFilter
-                (AccessAreaEnum.Customer, AccessModeEnum.Create);
+                (AreaEnum.Customer, mode);
 
             var access = new Models.Database.AreaAccess
             {
-                AreaId = (int)AccessAreaEnum.Customer,
+                AreaId = (int)AreaEnum.Customer,
+                Group = new Models.Database.Group
+                {
+                    Name = "Test",
+                    UserGroups = new[]
+                    {
+                        new Models.Database.UserGroup
+                        {
+                            UserId = AccountTicket.Id
+                        }
+                    }
+                },
                 CanRead = true
             };
 
-            access.GroupId = Database.UserGroups
-                .Where(e => e.UserId == AccountTicket.Id)
-                .Select(e => e.GroupId)
-                .First();
+            DbContext.AreaAccess.Add(access);
 
-            Database.AreaAccess.Add(access);
-
-            Database.SaveChanges();
+            DbContext.SaveChanges();
 
             Controller = new CustomerController(null)
             {
@@ -155,7 +213,45 @@ namespace Initial.Api.Tests.Filters
 
             // Assert
 
-            Assert.IsNull(actionExecutingContext.Result);
+            Assert.IsNotNull(actionExecutingContext.Result);
+
+            Assert.IsInstanceOf<UnauthorizedResult>
+                (actionExecutingContext.Result);
+        }
+
+        [TestCase(ModeEnum.All)]
+        [TestCase(ModeEnum.Read)]
+        [TestCase(ModeEnum.Create)]
+        [TestCase(ModeEnum.Delete)]
+        [TestCase(ModeEnum.Modify)]
+        public void OnActionExecuting_Area_UnauthorizedResult_None
+            (ModeEnum mode)
+        {
+            // Arrange
+
+            var filter = new AuthorizeFilter
+                (AreaEnum.Customer, mode);
+
+            Controller = new CustomerController(null)
+            {
+                AccountService = AccountService,
+
+                AccountTicket = AccountTicket
+            };
+
+            var actionExecutingContext =
+                MockHelper.ActionExecutingContext(Controller);
+
+            // Act
+
+            filter.OnActionExecuting(actionExecutingContext);
+
+            // Assert
+
+            Assert.IsNotNull(actionExecutingContext.Result);
+
+            Assert.IsInstanceOf<UnauthorizedResult>
+                (actionExecutingContext.Result);
         }
 
         [Test]
@@ -164,21 +260,27 @@ namespace Initial.Api.Tests.Filters
             // Arrange
 
             var filter = new AuthorizeFilter
-                (AccessPolicyEnum.UserChangePassword);
+                (PolicyEnum.User_ChangeEmail);
 
             var access = new Models.Database.PolicyAccess
             {
-                PolicyId = (int)AccessPolicyEnum.UserChangePassword
+                PolicyId = (int)PolicyEnum.User_ChangeEmail,
+                Group = new Models.Database.Group
+                {
+                    Name = "Test",
+                    UserGroups = new[]
+                    {
+                        new Models.Database.UserGroup
+                        {
+                            UserId = AccountTicket.Id
+                        }
+                    }
+                }
             };
 
-            access.GroupId = Database.UserGroups
-                .Where(e => e.UserId == AccountTicket.Id)
-                .Select(e => e.GroupId)
-                .First();
+            DbContext.PolicyAccess.Add(access);
 
-            Database.PolicyAccess.Add(access);
-
-            Database.SaveChanges();
+            DbContext.SaveChanges();
 
             Controller = new CustomerController(null)
             {
@@ -205,21 +307,27 @@ namespace Initial.Api.Tests.Filters
             // Arrange
 
             var filter = new AuthorizeFilter
-                (AccessPolicyEnum.UserChangePassword);
+                (PolicyEnum.User_ChangePassword);
 
             var access = new Models.Database.PolicyAccess
             {
-                PolicyId = (int)AccessPolicyEnum.UserChangeEmail
+                PolicyId = (int)PolicyEnum.User_ChangeEmail,
+                Group = new Models.Database.Group
+                {
+                    Name = "Test",
+                    UserGroups = new[]
+                    {
+                        new Models.Database.UserGroup
+                        {
+                            UserId = AccountTicket.Id
+                        }
+                    }
+                }
             };
 
-            access.GroupId = Database.UserGroups
-                .Where(e => e.UserId == AccountTicket.Id)
-                .Select(e => e.GroupId)
-                .First();
+            DbContext.PolicyAccess.Add(access);
 
-            Database.PolicyAccess.Add(access);
-
-            Database.SaveChanges();
+            DbContext.SaveChanges();
 
             Controller = new CustomerController(null)
             {
@@ -228,7 +336,7 @@ namespace Initial.Api.Tests.Filters
                 AccountTicket = AccountTicket
             };
 
-            var actionExecutingContext = 
+            var actionExecutingContext =
                 MockHelper.ActionExecutingContext(Controller);
 
             // Act
@@ -237,39 +345,72 @@ namespace Initial.Api.Tests.Filters
 
             // Assert
 
-            Assert.IsNull(actionExecutingContext.Result);
+            Assert.IsNotNull(actionExecutingContext.Result);
+
+            Assert.IsInstanceOf<UnauthorizedResult>
+                (actionExecutingContext.Result);
+        }
+
+        [Test]
+        public void OnActionExecuting_Policy_UnauthorizedResult_None()
+        {
+            // Arrange
+
+            var filter = new AuthorizeFilter
+                (PolicyEnum.User_ChangePassword);
+
+            Controller = new CustomerController(null)
+            {
+                AccountService = AccountService,
+
+                AccountTicket = AccountTicket
+            };
+
+            var actionExecutingContext =
+                MockHelper.ActionExecutingContext(Controller);
+
+            // Act
+
+            filter.OnActionExecuting(actionExecutingContext);
+
+            // Assert
+
+            Assert.IsNotNull(actionExecutingContext.Result);
+
+            Assert.IsInstanceOf<UnauthorizedResult>
+                (actionExecutingContext.Result);
         }
 
         #region Test
 
-        [TestCase(AccessModeEnum.None, AccessModeEnum.None)]
+        [TestCase(ModeEnum.None, ModeEnum.None)]
 
-        [TestCase(AccessModeEnum.Create, AccessModeEnum.Create)]
-        [TestCase(AccessModeEnum.Delete, AccessModeEnum.Delete)]
-        [TestCase(AccessModeEnum.Modify, AccessModeEnum.Modify)]
-        [TestCase(AccessModeEnum.Read, AccessModeEnum.Read)]
+        [TestCase(ModeEnum.Create, ModeEnum.Create)]
+        [TestCase(ModeEnum.Delete, ModeEnum.Delete)]
+        [TestCase(ModeEnum.Modify, ModeEnum.Modify)]
+        [TestCase(ModeEnum.Read, ModeEnum.Read)]
 
-        [TestCase(AccessModeEnum.None, AccessModeEnum.All)]
-        [TestCase(AccessModeEnum.Create, AccessModeEnum.All)]
-        [TestCase(AccessModeEnum.Delete, AccessModeEnum.All)]
-        [TestCase(AccessModeEnum.Modify, AccessModeEnum.All)]
-        [TestCase(AccessModeEnum.Read, AccessModeEnum.All)]
-        [TestCase(AccessModeEnum.All, AccessModeEnum.All)]
+        [TestCase(ModeEnum.None, ModeEnum.All)]
+        [TestCase(ModeEnum.Create, ModeEnum.All)]
+        [TestCase(ModeEnum.Delete, ModeEnum.All)]
+        [TestCase(ModeEnum.Modify, ModeEnum.All)]
+        [TestCase(ModeEnum.Read, ModeEnum.All)]
+        [TestCase(ModeEnum.All, ModeEnum.All)]
 
-        [TestCase(AccessModeEnum.Create | AccessModeEnum.Delete, AccessModeEnum.All)]
-        [TestCase(AccessModeEnum.Delete | AccessModeEnum.Modify, AccessModeEnum.All)]
-        [TestCase(AccessModeEnum.Modify | AccessModeEnum.Read, AccessModeEnum.All)]
+        [TestCase(ModeEnum.Create | ModeEnum.Delete, ModeEnum.All)]
+        [TestCase(ModeEnum.Delete | ModeEnum.Modify, ModeEnum.All)]
+        [TestCase(ModeEnum.Modify | ModeEnum.Read, ModeEnum.All)]
 
-        [TestCase(AccessModeEnum.Create | AccessModeEnum.Delete, AccessModeEnum.Create | AccessModeEnum.Delete)]
-        [TestCase(AccessModeEnum.Delete | AccessModeEnum.Modify, AccessModeEnum.Delete | AccessModeEnum.Modify)]
-        [TestCase(AccessModeEnum.Modify | AccessModeEnum.Read, AccessModeEnum.Modify | AccessModeEnum.Read)]
+        [TestCase(ModeEnum.Create | ModeEnum.Delete, ModeEnum.Create | ModeEnum.Delete)]
+        [TestCase(ModeEnum.Delete | ModeEnum.Modify, ModeEnum.Delete | ModeEnum.Modify)]
+        [TestCase(ModeEnum.Modify | ModeEnum.Read, ModeEnum.Modify | ModeEnum.Read)]
 
-        [TestCase(AccessModeEnum.Create | AccessModeEnum.Delete | AccessModeEnum.Modify, AccessModeEnum.All)]
-        [TestCase(AccessModeEnum.Delete | AccessModeEnum.Modify | AccessModeEnum.Read, AccessModeEnum.All)]
+        [TestCase(ModeEnum.Create | ModeEnum.Delete | ModeEnum.Modify, ModeEnum.All)]
+        [TestCase(ModeEnum.Delete | ModeEnum.Modify | ModeEnum.Read, ModeEnum.All)]
 
-        [TestCase(AccessModeEnum.Create | AccessModeEnum.Delete | AccessModeEnum.Modify, AccessModeEnum.Create | AccessModeEnum.Delete | AccessModeEnum.Modify)]
-        [TestCase(AccessModeEnum.Delete | AccessModeEnum.Modify | AccessModeEnum.Read, AccessModeEnum.Delete | AccessModeEnum.Modify | AccessModeEnum.Read)]
-        public void Test_Equal(AccessModeEnum must, AccessModeEnum have)
+        [TestCase(ModeEnum.Create | ModeEnum.Delete | ModeEnum.Modify, ModeEnum.Create | ModeEnum.Delete | ModeEnum.Modify)]
+        [TestCase(ModeEnum.Delete | ModeEnum.Modify | ModeEnum.Read, ModeEnum.Delete | ModeEnum.Modify | ModeEnum.Read)]
+        public void Test_Equal(ModeEnum must, ModeEnum have)
         {
             // Arrange
 
@@ -282,31 +423,31 @@ namespace Initial.Api.Tests.Filters
             Assert.IsTrue(result);
         }
 
-        [TestCase(AccessModeEnum.Create, AccessModeEnum.Delete)]
-        [TestCase(AccessModeEnum.Create, AccessModeEnum.Modify)]
-        [TestCase(AccessModeEnum.Create, AccessModeEnum.Read)]
-        [TestCase(AccessModeEnum.Create, AccessModeEnum.None)]
+        [TestCase(ModeEnum.Create, ModeEnum.Delete)]
+        [TestCase(ModeEnum.Create, ModeEnum.Modify)]
+        [TestCase(ModeEnum.Create, ModeEnum.Read)]
+        [TestCase(ModeEnum.Create, ModeEnum.None)]
 
-        [TestCase(AccessModeEnum.Delete, AccessModeEnum.Create)]
-        [TestCase(AccessModeEnum.Delete, AccessModeEnum.Modify)]
-        [TestCase(AccessModeEnum.Delete, AccessModeEnum.Read)]
-        [TestCase(AccessModeEnum.Delete, AccessModeEnum.None)]
+        [TestCase(ModeEnum.Delete, ModeEnum.Create)]
+        [TestCase(ModeEnum.Delete, ModeEnum.Modify)]
+        [TestCase(ModeEnum.Delete, ModeEnum.Read)]
+        [TestCase(ModeEnum.Delete, ModeEnum.None)]
 
-        [TestCase(AccessModeEnum.Modify, AccessModeEnum.Create)]
-        [TestCase(AccessModeEnum.Modify, AccessModeEnum.Delete)]
-        [TestCase(AccessModeEnum.Modify, AccessModeEnum.Read)]
-        [TestCase(AccessModeEnum.Modify, AccessModeEnum.None)]
+        [TestCase(ModeEnum.Modify, ModeEnum.Create)]
+        [TestCase(ModeEnum.Modify, ModeEnum.Delete)]
+        [TestCase(ModeEnum.Modify, ModeEnum.Read)]
+        [TestCase(ModeEnum.Modify, ModeEnum.None)]
 
-        [TestCase(AccessModeEnum.Read, AccessModeEnum.Create)]
-        [TestCase(AccessModeEnum.Read, AccessModeEnum.Delete)]
-        [TestCase(AccessModeEnum.Read, AccessModeEnum.Modify)]
-        [TestCase(AccessModeEnum.Read, AccessModeEnum.None)]
+        [TestCase(ModeEnum.Read, ModeEnum.Create)]
+        [TestCase(ModeEnum.Read, ModeEnum.Delete)]
+        [TestCase(ModeEnum.Read, ModeEnum.Modify)]
+        [TestCase(ModeEnum.Read, ModeEnum.None)]
 
-        [TestCase(AccessModeEnum.All, AccessModeEnum.Create)]
-        [TestCase(AccessModeEnum.All, AccessModeEnum.Delete)]
-        [TestCase(AccessModeEnum.All, AccessModeEnum.Modify)]
-        [TestCase(AccessModeEnum.All, AccessModeEnum.None)]
-        public void Test_NotEqual(AccessModeEnum must, AccessModeEnum have)
+        [TestCase(ModeEnum.All, ModeEnum.Create)]
+        [TestCase(ModeEnum.All, ModeEnum.Delete)]
+        [TestCase(ModeEnum.All, ModeEnum.Modify)]
+        [TestCase(ModeEnum.All, ModeEnum.None)]
+        public void Test_NotEqual(ModeEnum must, ModeEnum have)
         {
             // Arrange
 

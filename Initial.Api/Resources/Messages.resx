@@ -120,6 +120,9 @@
   <data name="EnterpriseId_Invalid" xml:space="preserve">
     <value>Invalid record.</value>
   </data>
+  <data name="EnterpriseId_ReadOnly" xml:space="preserve">
+    <value>Read Only record.</value>
+  </data>
   <data name="EntityVersion_Conflict" xml:space="preserve">
     <value>Optimistic concurrency conflit. The record you attempted to edit was modified by another user after you got the original value.</value>
   </data>

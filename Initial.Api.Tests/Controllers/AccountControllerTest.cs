@@ -16,7 +16,7 @@ namespace Initial.Api.Tests.Controllers
         {
             base.Setup();
 
-            Repository = new AccountRepository(Database);
+            Repository = new AccountRepository(DbContext);
 
             Service = new AccountService(Repository, AppSettings);
 
@@ -30,8 +30,8 @@ namespace Initial.Api.Tests.Controllers
 
             var request = new AccountLoginRequest
             {
-                Email = "lm@lm.com.br",
-                Password = "lm2019"
+                Email = "user@enterprisea.com",
+                Password = "user2019"
             };
 
             // Act
@@ -56,7 +56,7 @@ namespace Initial.Api.Tests.Controllers
 
             Assert.AreEqual(1, response.Id);
 
-            Assert.AreEqual("LM", response.Name);
+            Assert.AreEqual("User", response.Name);
 
             Assert.AreEqual(CryptoHelper.Guid("UP1"), response.PublicId);
 

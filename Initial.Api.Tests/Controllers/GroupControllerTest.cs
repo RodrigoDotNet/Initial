@@ -11,19 +11,19 @@ using System.Threading.Tasks;
 namespace Initial.Api.Tests.Controllers
 {
     [TestFixture]
-    public class CustomerControllerTest : ControllerServiceBaseTest
-        <CustomerRepository, CustomerService, CustomerController>
+    public class GroupControllerTest : ControllerServiceBaseTest
+        <GroupRepository, GroupService, GroupController>
     {
         [SetUp]
         public override void Setup()
         {
             base.Setup();
 
-            Repository = new CustomerRepository(DbContext);
+            Repository = new GroupRepository(DbContext);
 
-            Service = new CustomerService(Repository, AppSettings);
+            Service = new GroupService(Repository, AppSettings);
 
-            Controller = new CustomerController(Service)
+            Controller = new GroupController(Service)
             {
                 AccountService = AccountService,
 
@@ -48,19 +48,46 @@ namespace Initial.Api.Tests.Controllers
 
             var value = okObjectResult.Value;
 
-            Assert.IsInstanceOf<IEnumerable<CustomerResponse>>(value);
+            Assert.IsInstanceOf<IEnumerable<GroupResponse>>(value);
 
-            var response = (IEnumerable<CustomerResponse>)value;
+            var response = (IEnumerable<GroupResponse>)value;
 
             Assert.IsNotEmpty(response);
         }
 
         [Test]
-        public async Task Get()
+        public async Task GetAll_Authenticated()
         {
             // Arrange
 
-            var id = DbContext.Customers
+            Controller
+                .AccountTicket = null;
+
+            // Act
+
+            var actionResult = await Controller.GetAll();
+
+            // Assert
+
+            Assert.IsInstanceOf<OkObjectResult>(actionResult);
+
+            var okObjectResult = (OkObjectResult)actionResult;
+
+            var value = okObjectResult.Value;
+
+            Assert.IsInstanceOf<IEnumerable<GroupResponse>>(value);
+
+            var response = (IEnumerable<GroupResponse>)value;
+
+            Assert.IsNotEmpty(response);
+        }
+
+        [Test]
+        public async Task Get_Authenticated()
+        {
+            // Arrange
+
+            var id = DbContext.Groups
                 .First(e => e.EnterpriseId == AccountTicket.EnterpriseId).Id;
 
             // Act
@@ -75,9 +102,66 @@ namespace Initial.Api.Tests.Controllers
 
             var value = okObjectResult.Value;
 
-            Assert.IsInstanceOf<CustomerResponse>(value);
+            Assert.IsInstanceOf<GroupResponse>(value);
 
-            var response = (CustomerResponse)value;
+            var response = (GroupResponse)value;
+
+            Assert.AreEqual(id, response.Id);
+        }
+
+        [Test]
+        public async Task Get_ReadOnly()
+        {
+            // Arrange
+
+            var id = DbContext.Groups
+                .First(e => e.EnterpriseId == null).Id;
+
+            // Act
+
+            var actionResult = await Controller.Get(id);
+
+            // Assert
+
+            Assert.IsInstanceOf<OkObjectResult>(actionResult);
+
+            var okObjectResult = (OkObjectResult)actionResult;
+
+            var value = okObjectResult.Value;
+
+            Assert.IsInstanceOf<GroupResponse>(value);
+
+            var response = (GroupResponse)value;
+
+            Assert.AreEqual(id, response.Id);
+        }
+
+        [Test]
+        public async Task Get_UnAuthenticated()
+        {
+            // Arrange
+
+            Controller
+                .AccountTicket = null;
+
+            var id = DbContext.Groups
+                .First(e => e.EnterpriseId == null).Id;
+
+            // Act
+
+            var actionResult = await Controller.Get(id);
+
+            // Assert
+
+            Assert.IsInstanceOf<OkObjectResult>(actionResult);
+
+            var okObjectResult = (OkObjectResult)actionResult;
+
+            var value = okObjectResult.Value;
+
+            Assert.IsInstanceOf<GroupResponse>(value);
+
+            var response = (GroupResponse)value;
 
             Assert.AreEqual(id, response.Id);
         }
@@ -103,9 +187,9 @@ namespace Initial.Api.Tests.Controllers
         {
             // Arrange
 
-            var request = new CustomerRequest
+            var request = new GroupRequest
             {
-                Name = "Customer B"
+                Name = "Group B"
             };
 
             // Act
@@ -120,9 +204,9 @@ namespace Initial.Api.Tests.Controllers
 
             var value = okObjectResult.Value;
 
-            Assert.IsInstanceOf<CustomerResponse>(value);
+            Assert.IsInstanceOf<GroupResponse>(value);
 
-            var response = (CustomerResponse)value;
+            var response = (GroupResponse)value;
 
             Assert.Greater(response.Id, 0);
 
@@ -148,9 +232,9 @@ namespace Initial.Api.Tests.Controllers
         {
             // Arrange
 
-            var request = new CustomerRequest
+            var request = new GroupRequest
             {
-                Name = "Customer B"
+                Name = "Group B"
             };
 
             // Act
@@ -165,9 +249,9 @@ namespace Initial.Api.Tests.Controllers
 
             var value = okObjectResult.Value;
 
-            Assert.IsInstanceOf<CustomerResponse>(value);
+            Assert.IsInstanceOf<GroupResponse>(value);
 
-            var response = (CustomerResponse)value;
+            var response = (GroupResponse)value;
 
             Assert.Greater(response.Id, 0);
 
@@ -177,7 +261,7 @@ namespace Initial.Api.Tests.Controllers
 
             var id = response.Id;
 
-            request.Name = "Customer B+";
+            request.Name = "Group B+";
 
             // Act
 
@@ -191,9 +275,9 @@ namespace Initial.Api.Tests.Controllers
 
             value = okObjectResult.Value;
 
-            Assert.IsInstanceOf<CustomerResponse>(value);
+            Assert.IsInstanceOf<GroupResponse>(value);
 
-            response = (CustomerResponse)value;
+            response = (GroupResponse)value;
 
             Assert.AreEqual(id, response.Id);
 
@@ -207,9 +291,9 @@ namespace Initial.Api.Tests.Controllers
         {
             // Arrange
 
-            var request = new CustomerRequest
+            var request = new GroupRequest
             {
-                Name = "Customer B"
+                Name = "Group B"
             };
 
             // Act
@@ -224,9 +308,9 @@ namespace Initial.Api.Tests.Controllers
 
             var value = okObjectResult.Value;
 
-            Assert.IsInstanceOf<CustomerResponse>(value);
+            Assert.IsInstanceOf<GroupResponse>(value);
 
-            var response = (CustomerResponse)value;
+            var response = (GroupResponse)value;
 
             Assert.Greater(response.Id, 0);
 
@@ -236,7 +320,7 @@ namespace Initial.Api.Tests.Controllers
 
             var id = response.Id;
 
-            request.Name = "Customer B+";
+            request.Name = "Group B+";
 
             request.EntityVersion = response.EntityVersion;
 
@@ -252,9 +336,9 @@ namespace Initial.Api.Tests.Controllers
 
             value = okObjectResult.Value;
 
-            Assert.IsInstanceOf<CustomerResponse>(value);
+            Assert.IsInstanceOf<GroupResponse>(value);
 
-            response = (CustomerResponse)value;
+            response = (GroupResponse)value;
 
             Assert.AreEqual(id, response.Id);
 
@@ -268,9 +352,9 @@ namespace Initial.Api.Tests.Controllers
         {
             // Arrange
 
-            var request = new CustomerRequest
+            var request = new GroupRequest
             {
-                Name = "Customer B"
+                Name = "Group B"
             };
 
             // Act
@@ -285,9 +369,9 @@ namespace Initial.Api.Tests.Controllers
 
             var value = okObjectResult.Value;
 
-            Assert.IsInstanceOf<CustomerResponse>(value);
+            Assert.IsInstanceOf<GroupResponse>(value);
 
-            var response = (CustomerResponse)value;
+            var response = (GroupResponse)value;
 
             Assert.Greater(response.Id, 0);
 
@@ -297,7 +381,7 @@ namespace Initial.Api.Tests.Controllers
 
             var id = response.Id;
 
-            request.Name = "Customer B+";
+            request.Name = "Group B+";
 
             request.EntityVersion = response.EntityVersion.Value.AddDays(-1);
 
@@ -325,15 +409,72 @@ namespace Initial.Api.Tests.Controllers
         }
 
         [Test]
+        public async Task Put_EnterpriseId_ReadOnly()
+        {
+            // Arrange
+
+            var id = DbContext.Groups
+                .First(e => e.EnterpriseId == null).Id;
+
+            // Act
+
+            var actionResult = await Controller.Get(id);
+
+            // Assert
+
+            Assert.IsInstanceOf<OkObjectResult>(actionResult);
+
+            var okObjectResult = (OkObjectResult)actionResult;
+
+            var value = okObjectResult.Value;
+
+            Assert.IsInstanceOf<GroupResponse>(value);
+
+            var response = (GroupResponse)value;
+
+            Assert.AreEqual(id, response.Id);
+
+
+            // Arrange
+
+            var request = new GroupRequest
+            {
+                Name = "Group B"
+            };
+
+            // Act
+
+            actionResult = await Controller.Put(id, request);
+
+            // Assert
+
+            Assert.IsInstanceOf<ConflictObjectResult>(actionResult);
+
+            var conflictObjectResult = (ConflictObjectResult)actionResult;
+
+            value = conflictObjectResult.Value;
+
+            Assert.IsInstanceOf<StateResponse>(value);
+
+            var stateResponse = (StateResponse)value;
+
+            Assert.IsNotEmpty(stateResponse);
+
+            Assert.IsTrue(stateResponse.ContainsKey(""));
+
+            Assert.AreEqual(Messages.EnterpriseId_ReadOnly, stateResponse[""]);
+        }
+
+        [Test]
         public async Task Put_NotFound()
         {
             // Arrange
 
             var id = 0;
 
-            var request = new CustomerRequest
+            var request = new GroupRequest
             {
-                Name = "Customer B"
+                Name = "Group B"
             };
 
             // Act

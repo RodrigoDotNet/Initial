@@ -10,23 +10,23 @@ namespace Initial.Api.Filters
     {
         public int Order { get; set; } = 0;
 
-        public AccessAreaEnum? Area { get; }
+        public AreaEnum? Area { get; }
 
-        public AccessModeEnum? Mode { get; }
+        public ModeEnum? Mode { get; }
 
-        public AccessPolicyEnum? Policy { get; }
+        public PolicyEnum? Policy { get; }
 
         public AuthorizeFilter()
         {
         }
 
-        public AuthorizeFilter(AccessAreaEnum area, AccessModeEnum mode)
+        public AuthorizeFilter(AreaEnum area, ModeEnum mode)
         {
             Area = area;
             Mode = mode;
         }
 
-        public AuthorizeFilter(AccessPolicyEnum policy)
+        public AuthorizeFilter(PolicyEnum policy)
         {
             Policy = policy;
         }
@@ -68,9 +68,9 @@ namespace Initial.Api.Filters
             context.Result = new UnauthorizedResult();
         }
 
-        public static bool Test(AccessModeEnum must, AccessModeEnum have)
+        public static bool Test(ModeEnum must, ModeEnum have)
         {
-            foreach (Enum value in Enum.GetValues(typeof(AccessModeEnum)))
+            foreach (Enum value in Enum.GetValues(typeof(ModeEnum)))
                 if (must.HasFlag(value) && !have.HasFlag(value))
                     return false;
 

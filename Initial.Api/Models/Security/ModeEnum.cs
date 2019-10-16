@@ -3,7 +3,7 @@
 namespace Initial.Api.Models
 {
     [Flags]
-    public enum AccessModeEnum
+    public enum ModeEnum
     {
         None = 0,
 

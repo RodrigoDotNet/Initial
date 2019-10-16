@@ -6,15 +6,15 @@ using System;
 
 namespace Initial.Api.Models
 {
-    public partial class CustomerService
-        : PrivateService<Customer, CustomerRequest, CustomerResponse>, ICustomerService
+    public partial class GroupService
+        : PrivateService<Group, GroupRequest, GroupResponse>, IGroupService
     {
-        public CustomerService(ICustomerRepository repository, AppSettings appSettings)
+        public GroupService(IGroupRepository repository, AppSettings appSettings)
             : base(repository, appSettings) { }
 
-        protected override CustomerResponse Parse(Customer model)
+        protected override GroupResponse Parse(Group model)
         {
-            return new CustomerResponse
+            return new GroupResponse
             {
                 Id = model.Id,
                 Name = model.Name,
@@ -22,9 +22,9 @@ namespace Initial.Api.Models
             };
         }
 
-        protected override Customer Parse(AccountTicket user, CustomerRequest request)
+        protected override Group Parse(AccountTicket user, GroupRequest request)
         {
-            return new Customer
+            return new Group
             {
                 Name = request.Name,
                 EnterpriseId = user.EnterpriseId,
@@ -36,14 +36,14 @@ namespace Initial.Api.Models
             };
         }
 
-        protected override void Merge(AccountTicket user, Customer model, CustomerRequest request)
+        protected override void Merge(AccountTicket user, Group model, GroupRequest request)
         {
             model.Name = request.Name;
             model.LastModifiedDate = DateTime.Now;
             model.LastModifiedUserId = user.Id;
         }
 
-        protected override void AuditDelete(AccountTicket user, Customer model)
+        protected override void AuditDelete(AccountTicket user, Group model)
         {
             model.Inactive = true;
             model.LastModifiedDate = DateTime.Now;
@@ -51,16 +51,23 @@ namespace Initial.Api.Models
         }
 
         protected override bool Validate
-            (AccountTicket user, CustomerRequest request)
+            (AccountTicket user, GroupRequest request)
         {
             return base.Validate(user, request);
         }
 
         protected override bool Validate
-            (AccountTicket user, CustomerRequest request, Customer model)
+            (AccountTicket user, GroupRequest request, Group model)
         {
             if (model.Id > 0)
             {
+                if (model.EnterpriseId == null)
+                {
+                    State.Add("", Messages.EnterpriseId_ReadOnly);
+
+                    return false;
+                }
+
                 if (model.EnterpriseId != user.EnterpriseId)
                 {
                     State.Add("", Messages.EnterpriseId_Invalid);

@@ -20,9 +20,13 @@ namespace Initial.Api.Initializers
 
             services.AddScoped<AccountTicketBinderFilter>();
 
+            EnterpriseScope.Bind(services);
+
             AccountScope.Bind(services);
 
-            EnterpriseScope.Bind(services);
+            AreaScope.Bind(services);
+
+            CustomerScope.Bind(services);
         }
 
         public static void ConfigureErrorHandler

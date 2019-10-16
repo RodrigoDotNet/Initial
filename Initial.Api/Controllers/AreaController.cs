@@ -1,42 +1,38 @@
 ﻿using System.Threading.Tasks;
 using Initial.Api.Controllers.Templates;
-using Initial.Api.Filters;
 using Initial.Api.Models;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Examples;
 
 namespace Initial.Api.Controllers
 {
-    [Authorize]
-    [AuthorizeFilter]
     [ApiVersion("1.0")]
     [Route("/api/v{version:apiVersion}/[controller]/")]
     [ApiController]
-    public class EnterpriseController
-        : ControllerServiceBase<IEnterpriseService>
+    public class AreaController
+        : ControllerServiceBase<IAreaService>
     {
-        public EnterpriseController
-            (IEnterpriseService service)
+        public AreaController
+            (IAreaService service)
             : base(service) { }
 
         // GET api/values
         [HttpGet]
-        [ProducesResponseType(typeof(EnterpriseResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(AreaResponse), StatusCodes.Status200OK)]
         [SwaggerResponseExample(StatusCodes.Status200OK, typeof(GetAllResponse))]
         public async Task<IActionResult> GetAll()
         {
-            return await RepositoryService.GetAllAsync(AccountTicket);
+            return await RepositoryService.GetAllAsync();
         }
 
         // GET api/values/5
         [HttpGet("{id}")]
-        [ProducesResponseType(typeof(EnterpriseResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(AreaResponse), StatusCodes.Status200OK)]
         [SwaggerResponseExample(StatusCodes.Status200OK, typeof(GetResponse))]
         public async Task<IActionResult> Get(int id)
         {
-            return await RepositoryService.GetAsync(AccountTicket, id);
+            return await RepositoryService.GetAsync(id);
         }
 
         #region Examples
@@ -47,15 +43,15 @@ namespace Initial.Api.Controllers
             {
                 return new[]
                 {
-                    new EnterpriseResponse
+                    new AreaResponse
                     {
                         Id = 1,
-                        Name = "Enterprise A"
+                        Name = "Area A"
                     },
-                    new EnterpriseResponse
+                    new AreaResponse
                     {
                         Id = 2,
-                        Name = "Enterprise B"
+                        Name = "Area B"
                     }
                 };
             }
@@ -65,10 +61,10 @@ namespace Initial.Api.Controllers
         {
             public object GetExamples()
             {
-                return new EnterpriseResponse
+                return new AreaResponse
                 {
                     Id = 1,
-                    Name = "Enterprise A"
+                    Name = "Area A"
                 };
             }
         }

@@ -14,18 +14,18 @@ namespace Initial.Api.Controllers
     [ApiVersion("1.0")]
     [Route("/api/v{version:apiVersion}/[controller]/")]
     [ApiController]
-    public class CustomerController 
-        : ControllerServiceBase<ICustomerService>
+    public class GroupController 
+        : ControllerServiceBase<IGroupService>
     {
-        public CustomerController
-            (ICustomerService service)
+        public GroupController
+            (IGroupService service)
             : base(service) { }
 
         // GET api/values
         [HttpGet]
-        [ProducesResponseType(typeof(CustomerResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(GroupResponse), StatusCodes.Status200OK)]
         [SwaggerResponseExample(StatusCodes.Status200OK, typeof(GetAllResponse))]
-        [AuthorizeFilter(AreaEnum.Customer, ModeEnum.Read)]
+        [AllowAnonymous]
         public async Task<IActionResult> GetAll()
         {
             return await RepositoryService.GetAllAsync(AccountTicket);
@@ -33,9 +33,9 @@ namespace Initial.Api.Controllers
 
         // GET api/values/5
         [HttpGet("{id}")]
-        [ProducesResponseType(typeof(CustomerResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(GroupResponse), StatusCodes.Status200OK)]
         [SwaggerResponseExample(StatusCodes.Status200OK, typeof(GetResponse))]
-        [AuthorizeFilter(AreaEnum.Customer, ModeEnum.Read)]
+        [AllowAnonymous]
         public async Task<IActionResult> Get(int id)
         {
             return await RepositoryService.GetAsync(AccountTicket, id);
@@ -43,10 +43,10 @@ namespace Initial.Api.Controllers
 
         // DELETE api/values/5
         [HttpDelete("{id}")]
-        [ProducesResponseType(typeof(CustomerResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(GroupResponse), StatusCodes.Status200OK)]
         [SwaggerResponseExample(StatusCodes.Status200OK, typeof(GetResponse))]
-        [SwaggerRequestExample(typeof(CustomerRequest), typeof(PostRequest))]
-        [AuthorizeFilter(AreaEnum.Customer, ModeEnum.Delete)]
+        [SwaggerRequestExample(typeof(GroupRequest), typeof(PostRequest))]
+        [AuthorizeFilter(AreaEnum.Group, ModeEnum.Delete)]
         public async Task<IActionResult> Delete(int id)
         {
             return await RepositoryService.DeleteAsync(AccountTicket, id);
@@ -54,24 +54,24 @@ namespace Initial.Api.Controllers
 
         // POST api/values/5
         [HttpPost]
-        [ProducesResponseType(typeof(CustomerResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(GroupResponse), StatusCodes.Status200OK)]
         [SwaggerResponseExample(StatusCodes.Status200OK, typeof(GetResponse))]
-        [SwaggerRequestExample(typeof(CustomerRequest), typeof(PostRequest))]
-        [AuthorizeFilter(AreaEnum.Customer, ModeEnum.Create)]
+        [SwaggerRequestExample(typeof(GroupRequest), typeof(PostRequest))]
+        [AuthorizeFilter(AreaEnum.Group, ModeEnum.Create)]
         public async Task<IActionResult> Post
-            ([FromBody]CustomerRequest request)
+            ([FromBody]GroupRequest request)
         {
             return await RepositoryService.PostAsync(AccountTicket, request);
         }
 
         // POST api/values/5
         [HttpPut("{id}")]
-        [ProducesResponseType(typeof(CustomerResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(GroupResponse), StatusCodes.Status200OK)]
         [SwaggerResponseExample(StatusCodes.Status200OK, typeof(GetResponse))]
-        [SwaggerRequestExample(typeof(CustomerRequest), typeof(PostRequest))]
-        [AuthorizeFilter(AreaEnum.Customer, ModeEnum.Modify)]
+        [SwaggerRequestExample(typeof(GroupRequest), typeof(PostRequest))]
+        [AuthorizeFilter(AreaEnum.Group, ModeEnum.Modify)]
         public async Task<IActionResult> Put
-            (int id, [FromBody]CustomerRequest request)
+            (int id, [FromBody]GroupRequest request)
         {
             return await RepositoryService.PutAsync(AccountTicket, id, request);
         }
@@ -84,15 +84,15 @@ namespace Initial.Api.Controllers
             {
                 return new[]
                 {
-                    new CustomerResponse
+                    new GroupResponse
                     {
                         Id = 1,
-                        Name = "Customer A"
+                        Name = "Group A"
                     },
-                    new CustomerResponse
+                    new GroupResponse
                     {
                         Id = 2,
-                        Name = "Customer B"
+                        Name = "Group B"
                     }
                 };
             }
@@ -102,10 +102,10 @@ namespace Initial.Api.Controllers
         {
             public object GetExamples()
             {
-                return new CustomerResponse
+                return new GroupResponse
                 {
                     Id = 1,
-                    Name = "Customer A"
+                    Name = "Group A"
                 };
             }
         }
@@ -114,9 +114,9 @@ namespace Initial.Api.Controllers
         {
             public object GetExamples()
             {
-                return new CustomerRequest
+                return new GroupRequest
                 {
-                    Name = "Customer C"
+                    Name = "Group C"
                 };
             }
         }

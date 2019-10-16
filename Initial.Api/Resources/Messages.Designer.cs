@@ -70,6 +70,15 @@ namespace Initial.Api.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Read Only record..
+        /// </summary>
+        public static string EnterpriseId_ReadOnly {
+            get {
+                return ResourceManager.GetString("EnterpriseId_ReadOnly", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Optimistic concurrency conflit. The record you attempted to edit was modified by another user after you got the original value..
         /// </summary>
         public static string EntityVersion_Conflict {

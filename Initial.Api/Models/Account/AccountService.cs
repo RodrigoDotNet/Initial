@@ -93,27 +93,27 @@ namespace Initial.Api.Models
             return true;
         }
 
-        public async Task<AccessModeEnum> GetAccessAreaMode(AccountTicket ticket, AccessAreaEnum area)
+        public async Task<ModeEnum> GetAccessAreaMode(AccountTicket ticket, AreaEnum area)
         {
-            var response = new AccessModeEnum();
+            var response = new ModeEnum();
 
             var lst = await _repository.GetAreaAccess(ticket, (int)area);
 
             foreach (var item in lst)
             {
-                if (item.CanCreate) response |= AccessModeEnum.Create;
+                if (item.CanCreate) response |= ModeEnum.Create;
 
-                if (item.CanDelete) response |= AccessModeEnum.Delete;
+                if (item.CanDelete) response |= ModeEnum.Delete;
 
-                if (item.CanModify) response |= AccessModeEnum.Modify;
+                if (item.CanModify) response |= ModeEnum.Modify;
 
-                if (item.CanRead) response |= AccessModeEnum.Read;
+                if (item.CanRead) response |= ModeEnum.Read;
             }
 
             return response;
         }
 
-        public async Task<bool> HasPolicyAccess(AccountTicket ticket, AccessPolicyEnum policy)
+        public async Task<bool> HasPolicyAccess(AccountTicket ticket, PolicyEnum policy)
         {
             return await _repository.HasPolicyAccess(ticket, (int)policy);
         }

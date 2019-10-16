@@ -2,13 +2,14 @@
 using Initial.Api.Models.Database;
 using Initial.Api.Util;
 using Microsoft.EntityFrameworkCore;
+using NUnit.Framework;
 
 namespace Initial.Api.Tests.Controllers
 {
     public abstract class ControllerDefaultBaseTest
         <TController>
     {
-        protected InitialDatabase Database { get; private set; }
+        protected InitialDatabase DbContext { get; private set; }
 
         public AppSettings AppSettings { get; private set; }
 
@@ -18,25 +19,33 @@ namespace Initial.Api.Tests.Controllers
 
         protected AccountTicket AccountTicket { get; set; }
 
+        [SetUp]
         public virtual void Setup()
         {
             var options = new DbContextOptionsBuilder<InitialDatabase>()
                 .UseInMemoryDatabase(databaseName: "Initial_Api")
                 .Options;
 
-            Database = new InitialDatabase(options);
+            DbContext = new InitialDatabase(options);
 
             InitialDatabaseInit.EnsureCreated = false;
 
-            InitialDatabaseInit.Initialize(Database);
+            InitialDatabaseInit.Initialize(DbContext);
 
             AppSettings = AppSettings.Default;
 
-            AccountService = new AccountService(new AccountRepository(Database), AppSettings);
+            AccountService = new AccountService(new AccountRepository(DbContext), AppSettings);
 
             AccountService.IsValid(CryptoHelper.Guid("UP1"), out AccountTicket accountTicket);
 
             AccountTicket = accountTicket;
+        }
+
+        [TearDown]
+        public virtual void Down()
+        {
+            DbContext.Database
+                .EnsureDeleted();
         }
     }
 }
