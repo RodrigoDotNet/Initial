@@ -5,6 +5,9 @@ namespace Initial.Api.Models
 {
     public class CustomerRequest : EntityRequest
     {
+        /// <summary>
+        /// Nome
+        /// </summary>
         [Required]
         [StringLength(250, MinimumLength = 2)]
         public string Name { get; set; }

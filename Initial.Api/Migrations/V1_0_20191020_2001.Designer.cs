@@ -4,14 +4,16 @@ using Initial.Api.Models.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Initial.Api.Migrations
 {
     [DbContext(typeof(InitialDatabase))]
-    partial class InitialDatabaseModelSnapshot : ModelSnapshot
+    [Migration("V1_0_20191020_2001")]
+    partial class V1_0_20191020_2001
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

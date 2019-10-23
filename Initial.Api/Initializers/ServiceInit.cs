@@ -18,11 +18,19 @@ namespace Initial.Api.Initializers
                 options.UseSqlServer(configuration.GetConnectionString("InitialDatabase"))
             );
 
+            // A chamada a este Filter aqui, permite que ele também utilize o AccountScope
+
             services.AddScoped<AccountTicketBinderFilter>();
+
+            // Inicializadores dos serviços e repositórios da aplicação
+
+#warning Separar em módulos
 
             EnterpriseScope.Bind(services);
 
             AccountScope.Bind(services);
+
+            GroupScope.Bind(services);
 
             AreaScope.Bind(services);
 

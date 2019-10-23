@@ -6,6 +6,9 @@ using System;
 
 namespace Initial.Api.Filters
 {
+    /// <summary>
+    /// Autorização a partir do Token e acessos desejados
+    /// </summary>
     public class AuthorizeFilter : Attribute, IActionFilter, IOrderedFilter
     {
         public int Order { get; set; } = 0;
@@ -16,16 +19,23 @@ namespace Initial.Api.Filters
 
         public PolicyEnum? Policy { get; }
 
-        public AuthorizeFilter()
-        {
-        }
+        /// <summary>
+        /// Autorização simples
+        /// </summary>
+        public AuthorizeFilter() { }
 
+        /// <summary>
+        /// Autorização por área de acesso
+        /// </summary>
         public AuthorizeFilter(AreaEnum area, ModeEnum mode)
         {
             Area = area;
             Mode = mode;
         }
 
+        /// <summary>
+        /// Autorização por política de acesso (regra especial)
+        /// </summary>
         public AuthorizeFilter(PolicyEnum policy)
         {
             Policy = policy;

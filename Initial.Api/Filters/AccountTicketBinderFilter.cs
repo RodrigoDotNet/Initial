@@ -7,6 +7,9 @@ using System.Security.Claims;
 
 namespace Initial.Api.Filters
 {
+    /// <summary>
+    /// Filter para vincular o Token ao usuário da Controller (Ticket)
+    /// </summary>
     public class AccountTicketBinderFilter : IActionFilter, IOrderedFilter
     {
         public int Order { get; set; } = 0;

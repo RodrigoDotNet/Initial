@@ -7,6 +7,9 @@ using Swashbuckle.AspNetCore.Examples;
 
 namespace Initial.Api.Controllers
 {
+    /// <summary>
+    /// Métodos de áreas do sistema (Privada)
+    /// </summary>
     [ApiVersion("1.0")]
     [Route("/api/v{version:apiVersion}/[controller]/")]
     [ApiController]
@@ -17,7 +20,12 @@ namespace Initial.Api.Controllers
             (IAreaService service)
             : base(service) { }
 
-        // GET api/values
+        // GET api/Area
+
+        /// <summary>
+        /// Recuperar todos itens
+        /// </summary>
+        /// <returns>itens desejados</returns>
         [HttpGet]
         [ProducesResponseType(typeof(AreaResponse), StatusCodes.Status200OK)]
         [SwaggerResponseExample(StatusCodes.Status200OK, typeof(GetAllResponse))]
@@ -26,7 +34,13 @@ namespace Initial.Api.Controllers
             return await RepositoryService.GetAllAsync();
         }
 
-        // GET api/values/5
+        // GET api/Area/5
+
+        /// <summary>
+        /// Recuperar um item
+        /// </summary>
+        /// <param name="id">Código do item desejado</param>
+        /// <returns>Item desejado</returns>
         [HttpGet("{id}")]
         [ProducesResponseType(typeof(AreaResponse), StatusCodes.Status200OK)]
         [SwaggerResponseExample(StatusCodes.Status200OK, typeof(GetResponse))]

@@ -4,6 +4,9 @@ using System.Text;
 
 namespace Initial.Api.Util
 {
+    /// <summary>
+    /// Classe de cripografia
+    /// </summary>
     public class CryptoHelper
     {
         public static class Algorithms
@@ -19,18 +22,26 @@ namespace Initial.Api.Util
             public static readonly HashAlgorithm SHA512 = new SHA512Managed();
         }
 
+        /// <summary>
+        /// Transforma um texto em uma Hash MD5
+        /// </summary>
         public static string Hash(string text, HashAlgorithm algorithm)
         {
-            return BitConverter.ToString(algorithm.ComputeHash(Encoding.UTF8.GetBytes(text))).Replace("-", string.Empty);
+            return BitConverter
+                .ToString(algorithm.ComputeHash(Encoding.UTF8.GetBytes(text))).Replace("-", string.Empty);
         }
 
+        /// <summary>
+        /// Transforma um texto em uma Hash MD5
+        /// </summary>
         public static string Hash(string text)
         {
-            var algorithm = new MD5CryptoServiceProvider();
-
-            return Hash(text, algorithm);
+            return Hash(text, Algorithms.MD5);
         }
 
+        /// <summary>
+        /// Transforma um texto em uma Guid MD5
+        /// </summary>
         public static Guid Guid(string text)
         {
             if (text == null)
@@ -43,6 +54,9 @@ namespace Initial.Api.Util
             return new Guid(data);
         }
 
+        /// <summary>
+        /// Compara se um texto é equivalente a uma Guid MD5
+        /// </summary>
         public static bool Compare(string text, Guid guid)
         {
             try

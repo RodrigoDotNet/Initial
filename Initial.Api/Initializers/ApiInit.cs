@@ -10,6 +10,9 @@ using System.Text;
 
 namespace Initial.Api.Initializers
 {
+    /// <summary>
+    /// Inicializador da WebApi
+    /// </summary>
     public static class ApiInit
     {
         public static void ConfigureCompression(this IServiceCollection services)
@@ -21,6 +24,8 @@ namespace Initial.Api.Initializers
 
         public static void ConfigureApi(this IServiceCollection services)
         {
+            // Políticas de CORS
+
             services.AddCors(options =>
             {
                 options.AddPolicy("Default", builder =>
@@ -30,6 +35,8 @@ namespace Initial.Api.Initializers
                     builder.AllowAnyHeader();
                 });
             });
+
+            // Versionamento
 
             services.AddApiVersioning();
 
@@ -44,11 +51,16 @@ namespace Initial.Api.Initializers
         public static void ConfigureMvc
             (this IServiceCollection services, AppSettings appSettings)
         {
+            // Globalização, mais utlizado em MVC tradicional
+
             services.AddLocalization(options => options.ResourcesPath = "Resources");
+
+            // Configurações do MVC
 
             services
                 .AddMvc(options =>
                 {
+                    // Filter para vincular o Token ao usuário da Controller (Ticket)
                     options.Filters.Add<AccountTicketBinderFilter>();
 
                     // Ref.: @ValidateViewModel
@@ -57,6 +69,7 @@ namespace Initial.Api.Initializers
                     // Ref.: @ErrorHandler
                     options.Filters.Add<ExceptionFilter>();
 
+                    // Cache
                     options.CacheProfiles.Add("Default",
                         new CacheProfile()
                         {
@@ -109,6 +122,8 @@ namespace Initial.Api.Initializers
 
         public static void ConfigureApi(this IApplicationBuilder app)
         {
+            // Políticas de CORS
+
             app.UseCors("Default");
         }
 
@@ -119,7 +134,6 @@ namespace Initial.Api.Initializers
 
         public static void ConfigureJwt(this IApplicationBuilder app)
         {
-
             app.UseAuthentication();
         }
     }

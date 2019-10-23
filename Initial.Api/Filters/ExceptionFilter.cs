@@ -5,6 +5,10 @@ using Microsoft.AspNetCore.Mvc.Filters;
 namespace Initial.Api.Filters
 {
     // Ref: @ErrorHandler
+
+    /// <summary>
+    /// Filter padrão de tratamento de erros
+    /// </summary>
     public class ExceptionFilter : IActionFilter, IOrderedFilter
     {
         public int Order { get; set; } = int.MaxValue - 10;

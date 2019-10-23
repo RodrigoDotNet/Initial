@@ -1,5 +1,8 @@
 ﻿namespace Initial.Api.Util
 {
+    /// <summary>
+    /// Abstração dos dados do appsettings.json
+    /// </summary>
     public class AppSettings
     {
         public CacheSettings Cache { get; set; }

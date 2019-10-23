@@ -2,18 +2,16 @@
 using Initial.Api.Filters;
 using Initial.Api.Models;
 using Initial.Api.Models.Database;
-using Initial.Api.Tests.Controllers;
 using Initial.Api.Tests.Util;
 using Initial.Api.Util;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
-using System.Linq;
 
 namespace Initial.Api.Tests.Filters
 {
     [TestFixture]
-    public class AuthorizeFilterTest 
+    public class AuthorizeFilterTest
     {
         protected InitialDatabase DbContext { get; private set; }
 
@@ -32,17 +30,15 @@ namespace Initial.Api.Tests.Filters
                 .UseInMemoryDatabase(databaseName: "Initial_Api")
                 .Options;
 
-            DbContext = new InitialDatabase(options);
+            DbContext = new InitialDatabase(options) { IsTest = true };
 
-            InitialDatabaseInit.EnsureCreated = false;
-
-            InitialDatabaseInit.Initialize(DbContext);
+            DbContext.Seed();
 
             AppSettings = AppSettings.Default;
 
             AccountService = new AccountService(new AccountRepository(DbContext), AppSettings);
 
-            AccountService.IsValid(CryptoHelper.Guid("UP1"), out AccountTicket accountTicket);
+            AccountService.IsValid(CryptoHelper.Guid("U$1"), out AccountTicket accountTicket);
 
             AccountTicket = accountTicket;
         }
@@ -121,15 +117,15 @@ namespace Initial.Api.Tests.Filters
             var filter = new AuthorizeFilter
                 (AreaEnum.Customer, mode);
 
-            var access = new Models.Database.AreaAccess
+            var access = new AreaAccess
             {
                 AreaId = (int)AreaEnum.Customer,
-                Group = new Models.Database.Group
+                Group = new Group
                 {
                     Name = "Test",
                     UserGroups = new[]
                     {
-                        new Models.Database.UserGroup
+                        new UserGroup
                         {
                             UserId = AccountTicket.Id
                         }
@@ -176,15 +172,15 @@ namespace Initial.Api.Tests.Filters
             var filter = new AuthorizeFilter
                 (AreaEnum.Customer, mode);
 
-            var access = new Models.Database.AreaAccess
+            var access = new AreaAccess
             {
                 AreaId = (int)AreaEnum.Customer,
-                Group = new Models.Database.Group
+                Group = new Group
                 {
                     Name = "Test",
                     UserGroups = new[]
                     {
-                        new Models.Database.UserGroup
+                        new UserGroup
                         {
                             UserId = AccountTicket.Id
                         }
@@ -262,15 +258,15 @@ namespace Initial.Api.Tests.Filters
             var filter = new AuthorizeFilter
                 (PolicyEnum.User_ChangeEmail);
 
-            var access = new Models.Database.PolicyAccess
+            var access = new PolicyAccess
             {
                 PolicyId = (int)PolicyEnum.User_ChangeEmail,
-                Group = new Models.Database.Group
+                Group = new Group
                 {
                     Name = "Test",
                     UserGroups = new[]
                     {
-                        new Models.Database.UserGroup
+                        new UserGroup
                         {
                             UserId = AccountTicket.Id
                         }
@@ -309,15 +305,15 @@ namespace Initial.Api.Tests.Filters
             var filter = new AuthorizeFilter
                 (PolicyEnum.User_ChangePassword);
 
-            var access = new Models.Database.PolicyAccess
+            var access = new PolicyAccess
             {
                 PolicyId = (int)PolicyEnum.User_ChangeEmail,
-                Group = new Models.Database.Group
+                Group = new Group
                 {
                     Name = "Test",
                     UserGroups = new[]
                     {
-                        new Models.Database.UserGroup
+                        new UserGroup
                         {
                             UserId = AccountTicket.Id
                         }

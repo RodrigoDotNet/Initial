@@ -10,7 +10,7 @@ namespace Initial.Api.Controllers
     // Ref: @ErrorHandler
 
     /// <summary>
-    /// Tratamento de erro
+    /// Tratamento de erro (Oculta)
     /// </summary>
     [ApiController]
     [ApiVersionNeutral]

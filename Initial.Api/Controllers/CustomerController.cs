@@ -9,6 +9,9 @@ using Swashbuckle.AspNetCore.Examples;
 
 namespace Initial.Api.Controllers
 {
+    /// <summary>
+    /// Métodos de clientes (Privada)
+    /// </summary>
     [Authorize]
     [AuthorizeFilter]
     [ApiVersion("1.0")]
@@ -21,7 +24,12 @@ namespace Initial.Api.Controllers
             (ICustomerService service)
             : base(service) { }
 
-        // GET api/values
+        // GET api/Customer
+
+        /// <summary>
+        /// Recuperar todos itens
+        /// </summary>
+        /// <returns>itens desejados</returns>
         [HttpGet]
         [ProducesResponseType(typeof(CustomerResponse), StatusCodes.Status200OK)]
         [SwaggerResponseExample(StatusCodes.Status200OK, typeof(GetAllResponse))]
@@ -31,7 +39,13 @@ namespace Initial.Api.Controllers
             return await RepositoryService.GetAllAsync(AccountTicket);
         }
 
-        // GET api/values/5
+        // GET api/Customer/5
+
+        /// <summary>
+        /// Recuperar um item
+        /// </summary>
+        /// <param name="id">Código do item desejado</param>
+        /// <returns>Item desejado</returns>
         [HttpGet("{id}")]
         [ProducesResponseType(typeof(CustomerResponse), StatusCodes.Status200OK)]
         [SwaggerResponseExample(StatusCodes.Status200OK, typeof(GetResponse))]
@@ -41,7 +55,13 @@ namespace Initial.Api.Controllers
             return await RepositoryService.GetAsync(AccountTicket, id);
         }
 
-        // DELETE api/values/5
+        // DELETE api/Customer/5
+
+        /// <summary>
+        /// Excluir um item
+        /// </summary>
+        /// <param name="id">Código do item desejado</param>
+        /// <returns>Item excluído</returns>
         [HttpDelete("{id}")]
         [ProducesResponseType(typeof(CustomerResponse), StatusCodes.Status200OK)]
         [SwaggerResponseExample(StatusCodes.Status200OK, typeof(GetResponse))]
@@ -52,7 +72,13 @@ namespace Initial.Api.Controllers
             return await RepositoryService.DeleteAsync(AccountTicket, id);
         }
 
-        // POST api/values/5
+        // POST api/Customer
+        
+        /// <summary>
+        /// Criar um item
+        /// </summary>
+        /// <param name="request">Definição do item</param>
+        /// <returns>Item criado</returns>
         [HttpPost]
         [ProducesResponseType(typeof(CustomerResponse), StatusCodes.Status200OK)]
         [SwaggerResponseExample(StatusCodes.Status200OK, typeof(GetResponse))]
@@ -64,7 +90,13 @@ namespace Initial.Api.Controllers
             return await RepositoryService.PostAsync(AccountTicket, request);
         }
 
-        // POST api/values/5
+        // PUT api/Customer/4
+
+        /// <summary>
+        /// Alterar um item
+        /// </summary>
+        /// <param name="request">Definição do item</param>
+        /// <returns>Item alterado</returns>
         [HttpPut("{id}")]
         [ProducesResponseType(typeof(CustomerResponse), StatusCodes.Status200OK)]
         [SwaggerResponseExample(StatusCodes.Status200OK, typeof(GetResponse))]

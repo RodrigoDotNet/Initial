@@ -26,17 +26,15 @@ namespace Initial.Api.Tests.Controllers
                 .UseInMemoryDatabase(databaseName: "Initial_Api")
                 .Options;
 
-            DbContext = new InitialDatabase(options);
+            DbContext = new InitialDatabase(options) { IsTest = true };
 
-            InitialDatabaseInit.EnsureCreated = false;
-
-            InitialDatabaseInit.Initialize(DbContext);
+            DbContext.Seed();
 
             AppSettings = AppSettings.Default;
 
             AccountService = new AccountService(new AccountRepository(DbContext), AppSettings);
 
-            AccountService.IsValid(CryptoHelper.Guid("UP1"), out AccountTicket accountTicket);
+            AccountService.IsValid(CryptoHelper.Guid("U$1"), out AccountTicket accountTicket);
 
             AccountTicket = accountTicket;
         }

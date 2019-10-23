@@ -9,6 +9,9 @@ using Swashbuckle.AspNetCore.Examples;
 
 namespace Initial.Api.Controllers
 {
+    /// <summary>
+    /// Métodos de empresa (Privada)
+    /// </summary>
     [Authorize]
     [AuthorizeFilter]
     [ApiVersion("1.0")]
@@ -21,7 +24,12 @@ namespace Initial.Api.Controllers
             (IEnterpriseService service)
             : base(service) { }
 
-        // GET api/values
+        // GET api/Enterprise
+
+        /// <summary>
+        /// Recuperar todos itens
+        /// </summary>
+        /// <returns>itens desejados</returns>
         [HttpGet]
         [ProducesResponseType(typeof(EnterpriseResponse), StatusCodes.Status200OK)]
         [SwaggerResponseExample(StatusCodes.Status200OK, typeof(GetAllResponse))]
@@ -30,7 +38,13 @@ namespace Initial.Api.Controllers
             return await RepositoryService.GetAllAsync(AccountTicket);
         }
 
-        // GET api/values/5
+        // GET api/Enterprise/5
+
+        /// <summary>
+        /// Recuperar um item
+        /// </summary>
+        /// <param name="id">Código do item desejado</param>
+        /// <returns>Item desejado</returns>
         [HttpGet("{id}")]
         [ProducesResponseType(typeof(EnterpriseResponse), StatusCodes.Status200OK)]
         [SwaggerResponseExample(StatusCodes.Status200OK, typeof(GetResponse))]

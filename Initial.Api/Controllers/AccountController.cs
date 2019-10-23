@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 namespace Initial.Api.Controllers
 {
     /// <summary>
-    /// Serviço de autenticação
+    /// Métodos de autenticação (Pública)
     /// </summary>
     [ApiVersion("1.0")]
     [Route("/api/v{version:apiVersion}/[controller]/")]
@@ -22,6 +22,8 @@ namespace Initial.Api.Controllers
         public AccountController
             (IAccountService service)
             : base(service) { }
+
+        // POST api/Account/Login
 
         /// <summary>
         /// Método de login
@@ -62,8 +64,8 @@ namespace Initial.Api.Controllers
             {
                 return new AccountLoginRequest
                 {
-                    Email = "lm@lm.com.br",
-                    Password = "lm2019"
+                    Email = "user@enterprisetest.com",
+                    Password = "user2019"
                 };
             }
         }

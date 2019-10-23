@@ -30,7 +30,7 @@ namespace Initial.Api.Tests.Controllers
 
             var request = new AccountLoginRequest
             {
-                Email = "user@enterprisea.com",
+                Email = "user@enterprisetest.com",
                 Password = "user2019"
             };
 
@@ -58,9 +58,49 @@ namespace Initial.Api.Tests.Controllers
 
             Assert.AreEqual("User", response.Name);
 
-            Assert.AreEqual(CryptoHelper.Guid("UP1"), response.PublicId);
+            Assert.AreEqual(CryptoHelper.Guid("U$1"), response.PublicId);
 
             Assert.IsNotNull(response.Token);
+        }
+
+        [Test]
+        public async Task Login_WrongEmail()
+        {
+            // Arrange
+
+            var request = new AccountLoginRequest
+            {
+                Email = "user@enterprisetest.com.br",
+                Password = "user2019"
+            };
+
+            // Act
+
+            var actionResult = await Controller.Login(request);
+
+            // Assert
+
+            Assert.IsInstanceOf<NotFoundResult>(actionResult);
+        }
+
+        [Test]
+        public async Task Login_WrongPassword()
+        {
+            // Arrange
+
+            var request = new AccountLoginRequest
+            {
+                Email = "user@enterprisetest.com",
+                Password = "user2018"
+            };
+
+            // Act
+
+            var actionResult = await Controller.Login(request);
+
+            // Assert
+
+            Assert.IsInstanceOf<NotFoundResult>(actionResult);
         }
     }
 }

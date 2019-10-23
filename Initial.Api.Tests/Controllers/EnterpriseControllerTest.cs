@@ -3,7 +3,6 @@ using Initial.Api.Models;
 using Microsoft.AspNetCore.Mvc;
 using NUnit.Framework;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace Initial.Api.Tests.Controllers

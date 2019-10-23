@@ -9,54 +9,78 @@ using Swashbuckle.AspNetCore.Examples;
 
 namespace Initial.Api.Controllers
 {
-    [Authorize]
-    [AuthorizeFilter]
+    /// <summary>
+    /// Métodos de grupos (Pública e Privada)
+    /// </summary>
     [ApiVersion("1.0")]
     [Route("/api/v{version:apiVersion}/[controller]/")]
     [ApiController]
-    public class GroupController 
+    public class GroupController
         : ControllerServiceBase<IGroupService>
     {
         public GroupController
             (IGroupService service)
             : base(service) { }
 
-        // GET api/values
+        // GET api/Group
+
+        /// <summary>
+        /// Recuperar todos itens (Pública + Privada, se autenticado)
+        /// </summary>
+        /// <returns>itens desejados</returns>
         [HttpGet]
         [ProducesResponseType(typeof(GroupResponse), StatusCodes.Status200OK)]
         [SwaggerResponseExample(StatusCodes.Status200OK, typeof(GetAllResponse))]
-        [AllowAnonymous]
         public async Task<IActionResult> GetAll()
         {
             return await RepositoryService.GetAllAsync(AccountTicket);
         }
 
-        // GET api/values/5
+        // GET api/Group/5
+
+        /// <summary>
+        /// Recuperar um item (Pública + Privada, se autenticado)
+        /// </summary>
+        /// <param name="id">Código do item desejado</param>
+        /// <returns>Item desejado</returns>
         [HttpGet("{id}")]
         [ProducesResponseType(typeof(GroupResponse), StatusCodes.Status200OK)]
         [SwaggerResponseExample(StatusCodes.Status200OK, typeof(GetResponse))]
-        [AllowAnonymous]
         public async Task<IActionResult> Get(int id)
         {
             return await RepositoryService.GetAsync(AccountTicket, id);
         }
 
-        // DELETE api/values/5
+        // DELETE api/Group/5
+
+        /// <summary>
+        /// Excluir um item (Privada)
+        /// </summary>
+        /// <param name="id">Código do item desejado</param>
+        /// <returns>Item excluído</returns>
         [HttpDelete("{id}")]
         [ProducesResponseType(typeof(GroupResponse), StatusCodes.Status200OK)]
         [SwaggerResponseExample(StatusCodes.Status200OK, typeof(GetResponse))]
         [SwaggerRequestExample(typeof(GroupRequest), typeof(PostRequest))]
+        [Authorize]
         [AuthorizeFilter(AreaEnum.Group, ModeEnum.Delete)]
         public async Task<IActionResult> Delete(int id)
         {
             return await RepositoryService.DeleteAsync(AccountTicket, id);
         }
 
-        // POST api/values/5
+        // POST api/Group
+
+        /// <summary>
+        /// Criar um item (Privada)
+        /// </summary>
+        /// <param name="request">Definição do item</param>
+        /// <returns>Item criado</returns>
         [HttpPost]
         [ProducesResponseType(typeof(GroupResponse), StatusCodes.Status200OK)]
         [SwaggerResponseExample(StatusCodes.Status200OK, typeof(GetResponse))]
         [SwaggerRequestExample(typeof(GroupRequest), typeof(PostRequest))]
+        [Authorize]
         [AuthorizeFilter(AreaEnum.Group, ModeEnum.Create)]
         public async Task<IActionResult> Post
             ([FromBody]GroupRequest request)
@@ -64,11 +88,18 @@ namespace Initial.Api.Controllers
             return await RepositoryService.PostAsync(AccountTicket, request);
         }
 
-        // POST api/values/5
+        // PUT api/Group/4
+
+        /// <summary>
+        /// Alterar um item (Privada)
+        /// </summary>
+        /// <param name="request">Definição do item</param>
+        /// <returns>Item alterado</returns>
         [HttpPut("{id}")]
         [ProducesResponseType(typeof(GroupResponse), StatusCodes.Status200OK)]
         [SwaggerResponseExample(StatusCodes.Status200OK, typeof(GetResponse))]
         [SwaggerRequestExample(typeof(GroupRequest), typeof(PostRequest))]
+        [Authorize]
         [AuthorizeFilter(AreaEnum.Group, ModeEnum.Modify)]
         public async Task<IActionResult> Put
             (int id, [FromBody]GroupRequest request)

@@ -1,13 +1,11 @@
 ﻿using System;
-using System.IO;
+using Initial.Api.Initializers;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Serilog;
-using Serilog.Events;
 
 namespace Initial.Api
 {
@@ -15,25 +13,12 @@ namespace Initial.Api
     {
         public static int Main(string[] args)
         {
-            var host = CreateWebHostBuilder(args).Build();
+            var host = CreateWebHostBuilder(args)
+                .Build();
 
             CreateDbIfNotExists(host);
 
-            var appSettings = new ConfigurationBuilder()
-                 .SetBasePath(Directory.GetCurrentDirectory())
-                 .AddJsonFile("appsettings.json")
-                 .Build();
-
-            var connectionString = appSettings.GetConnectionString("InitialDatabase");
-
-            var tableName = "Log";
-
-            Log.Logger = new LoggerConfiguration()
-                .MinimumLevel.Debug()
-                .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
-                .Enrich.FromLogContext()
-                .WriteTo.MSSqlServer(connectionString, tableName)
-                .CreateLogger();
+            LogInit.Setup();
 
             try
             {
@@ -55,6 +40,10 @@ namespace Initial.Api
             }
         }
 
+        /// <summary>
+        /// Configurei o banco de dados para utilizar um SQLEXPRESS.
+        /// Se precisar mudar isso, veja a string de conexão no 'appsettings.json'.
+        /// </summary>
         private static void CreateDbIfNotExists(IWebHost host)
         {
             using (var scope = host.Services.CreateScope())
@@ -66,12 +55,12 @@ namespace Initial.Api
                     var context = services
                         .GetRequiredService<Models.Database.InitialDatabase>();
 
-                    Models.Database.InitialDatabaseInit
-                        .Initialize(context);
+                    context.Seed();
                 }
                 catch (Exception ex)
                 {
-                    var logger = services.GetRequiredService<ILogger<Program>>();
+                    var logger = services
+                        .GetRequiredService<ILogger<Program>>();
 
                     logger.LogError(ex, "An error occurred creating the DB.");
                 }
